@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -76,29 +77,37 @@ namespace Phonon
             PrimaryList.Children.Clear();
 
             // Go back
-            System.Windows.Controls.Button btn = new System.Windows.Controls.Button();
+            ToggleButton btn = new ToggleButton();
             btn.Content = "Go back to package list";
-            btn.Margin = new Thickness(0, 0, 0, 0);
+            btn.Padding = new Thickness(10, 5, 0, 5);
+            btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
             PrimaryList.Children.Add(btn);
 
             foreach (Dynamic dynamic in pkg.Dynamics)
             {
-                btn = new System.Windows.Controls.Button();
+                btn = new ToggleButton();
                 btn.Content = new TextBlock
                 {
                     Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
                 };
-                btn.Margin = new Thickness(0, 0, 0, 0);
+                btn.Padding = new Thickness(10, 10, 0, 10);
+                btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
                 PrimaryList.Children.Add(btn);
             }
+            ScrollView.ScrollToTop();
         }
 
         private void Dynamic_Click(object sender, RoutedEventArgs e)
         {
-            string ClickedDynamicHash = (((sender as System.Windows.Controls.Button).Content) as TextBlock).Text.Split("\n")[0];
+            foreach (ToggleButton button in PrimaryList.Children)
+            {
+                button.IsChecked = false;
+            }
+            (sender as ToggleButton).IsChecked = true;
+            string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
             Dynamic dynamic = new Dynamic(Convert.ToUInt32(ClickedDynamicHash, 16));
             dynamic.GetDynamicMesh(GetPackagesPath());
             MainViewModel MVM = (MainViewModel)Wind.Resources["MVM"];
@@ -268,10 +277,11 @@ namespace Phonon
                 // We want to verify that this pkg has at least 1 dynamic model in it.
                 System.Windows.Controls.Button btn = new System.Windows.Controls.Button();
                 btn.Content = pkg.Name;
-                btn.Margin = new Thickness(0, 0, 0, 0);
+                btn.Padding = new Thickness(10, 10, 0, 10);
                 btn.Click += PkgButton_Click;
                 PrimaryList.Children.Add(btn);
             }
+            ScrollView.ScrollToTop();
         }
 
         private bool SetPackagePath(string Path)

@@ -14,8 +14,8 @@
         <Binding Source="{StaticResource MVM}"/>
     </Window.DataContext>
     <Grid>
-        <ScrollViewer Margin="0,0,1559,0" Background="#3d3d3d">
-            <StackPanel x:Name="PrimaryList" VerticalAlignment="Top" HorizontalAlignment="Left">
+        <ScrollViewer Margin="0,0,1559,0" Background="#3d3d3d" Name="ScrollView">
+            <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Button x:Name="SelectPkgsDirectoryButton" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click"/>
             </StackPanel>
         </ScrollViewer>
