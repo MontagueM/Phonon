@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Phonon": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

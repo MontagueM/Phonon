@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Phonon
 {
     using System.ComponentModel;
+    using System.IO;
     using System.Runtime.CompilerServices;
     using System.Windows.Data;
     using System.Windows.Media;
@@ -27,6 +28,7 @@ namespace Phonon
             Dynamic dynamic = new Dynamic(0);
             dynamic.Vertices = new List<float[]>();
             dynamic.Faces = new List<uint[]>();
+            if (!File.Exists("msh.tmp")) return;
             dynamic.ReadMeshData(dynamic.Vertices, dynamic.Faces);
             UpdateModel(dynamic.Vertices, dynamic.Faces);
         }

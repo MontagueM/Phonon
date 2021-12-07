@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Phonon
 {
+
     class Dynamic
     {
         public uint Hash;
@@ -40,38 +41,24 @@ namespace Phonon
 
         public bool GetDynamicInfo(string PackagesPath)
         {
-            const string DLLPath = "C:/Users/monta/OneDrive/Destiny 2 Datamining/CPP/DestinyDataminingCPP/x64/Debug/DestinyDynamicExtractor.dll";
-            [DllImport(DLLPath)]
-            static extern bool RequestDynamicInformation(string DynamicHash, string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
-
             GetHashString();
             // TODO do this on a separate thread as to not lag the UI
             bool status = false;
-            while (true)
-            {
-                try
-                {
-                    status = RequestDynamicInformation(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
-                    break;
-                }
-                catch (System.AccessViolationException e)
-                {
-                    continue;
-                }
-            }
-            return status & (MeshCount > 0);
+            [DllImport(@"DestinyDynamicExtractor.dll")]
+            static extern bool RequestDynamicInformation([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
+            status = RequestDynamicInformation(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
+            return status && (MeshCount > 0);
         }
 
         public bool GetDynamicMesh(string PackagesPath)
         {
             Vertices = new List<float[]>();
             Faces = new List<uint[]>();
-            const string DLLPath = "C:/Users/monta/OneDrive/Destiny 2 Datamining/CPP/DestinyDataminingCPP/x64/Debug/DestinyDynamicExtractor.dll";
-            [DllImport(DLLPath)]
-            static extern bool RequestSaveDynamicMeshData(string DynamicHash, string pkgsPath);
-            var a = Hash.ToString("X");
-            RequestSaveDynamicMeshData(Hash.ToString("X"), PackagesPath);
-            return ReadMeshData(Vertices, Faces);
+            [DllImport(@"DestinyDynamicExtractor.dll")]
+            static extern bool RequestSaveDynamicMeshData([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
+            var a = Hash.ToString("X8");
+            bool status = RequestSaveDynamicMeshData(a, PackagesPath);
+            return ReadMeshData(Vertices, Faces) && status;
         }
 
         public bool ReadMeshData(List<float[]> Vertices, List<uint[]> Faces)

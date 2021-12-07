@@ -26,7 +26,6 @@ namespace Phonon
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
-        int ThreadCounter = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -54,6 +53,7 @@ namespace Phonon
                 {
                     SelectPkgsDirectoryButton.Visibility = Visibility.Hidden;
                     LoadPackageList();
+                    ShowPackageList();
                 }
             }
         }
@@ -197,10 +197,10 @@ namespace Phonon
                     }
                 }
             }
-            ThreadCounter = Packages.Values.Count;
             foreach (Package pkg in Packages.Values.ToList())
             {
                 ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
+                //ThreadProc(pkg);
             }
             int workerThreads = 0; int completionPortThreads = 0; int maxWorkerThreads = 0; int maxCompletionPortThreads = 0;
             ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxCompletionPortThreads);
@@ -238,19 +238,18 @@ namespace Phonon
         }
 
         private void ThreadProc(object state)
+        //private void ThreadProc(Package pkg)
         {
             object[] array = state as object[];
             Package pkg = (Package)array[0];
-            if (pkg.Header.PkgID != 0x2f0)
-            {
-                Packages.TryRemove(pkg.Name, out pkg);
-                ThreadCounter--;
-                return;
-            }
+            //if (pkg.Header.PkgID != 0x2f0)
+            //{
+            //    Packages.TryRemove(pkg.Name, out pkg);
+            //    return;
+            //}
             if (!pkg.GetDynamicIndices())
             {
                 Packages.TryRemove(pkg.Name, out pkg);
-                ThreadCounter--;
                 return;
             }
             pkg.GetDynamics(GetPackagesPath());
@@ -259,7 +258,6 @@ namespace Phonon
             {
                 Packages.TryRemove(pkg.Name, out pkg);
             }
-            ThreadCounter--;
         }
 
         private void ShowPackageList()
