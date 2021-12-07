@@ -14,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
@@ -86,13 +87,22 @@ namespace Phonon
                 btn = new System.Windows.Controls.Button();
                 btn.Content = new TextBlock
                 {
-                    Text = dynamic.HashString + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
+                    Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
                 };
                 btn.Margin = new Thickness(0, 0, 0, 0);
-                //btn.Click += PkgButton_Click;
+                btn.Click += Dynamic_Click;
                 PrimaryList.Children.Add(btn);
             }
+        }
+
+        private void Dynamic_Click(object sender, RoutedEventArgs e)
+        {
+            string ClickedDynamicHash = (((sender as System.Windows.Controls.Button).Content) as TextBlock).Text.Split("\n")[0];
+            Dynamic dynamic = new Dynamic(Convert.ToUInt32(ClickedDynamicHash, 16));
+            dynamic.GetDynamicMesh(GetPackagesPath());
+            MainViewModel MVM = (MainViewModel)Wind.Resources["MVM"];
+            MVM.UpdateModel(dynamic.Vertices, dynamic.Faces);
         }
 
         private void GoBack_Click(object sender, RoutedEventArgs e)
@@ -192,8 +202,11 @@ namespace Phonon
             {
                 ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
             }
-            while (ThreadCounter > 0)
+            int workerThreads = 0; int completionPortThreads = 0; int maxWorkerThreads = 0; int maxCompletionPortThreads = 0;
+            ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxCompletionPortThreads);
+            while (workerThreads != maxWorkerThreads)
             {
+                ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
                 continue;
             }
             System.Diagnostics.Debug.WriteLine("Finished generation");

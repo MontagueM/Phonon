@@ -6,9 +6,12 @@
         xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:local="clr-namespace:Phonon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920">
+        Title="MainWindow" Height="1080" Width="1920" Name="Wind">
+    <Window.Resources>
+        <local:MainViewModel x:Key="MVM"/>
+    </Window.Resources>
     <Window.DataContext>
-        <local:MainViewModel />
+        <Binding Source="{StaticResource MVM}"/>
     </Window.DataContext>
     <Grid>
         <ScrollViewer Margin="0,0,1559,0" Background="#3d3d3d">
@@ -18,7 +21,7 @@
         </ScrollViewer>
         <HelixToolkit:HelixViewport3D ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="True" RotateAroundMouseDownPoint="True" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Margin="344,0,0,0">
             <HelixToolkit:SunLight/>
-            <ModelVisual3D Content="{Binding Model}" />
+            <ModelVisual3D x:Name="Yoo" Content="{Binding Model, UpdateSourceTrigger=PropertyChanged}" />
             <HelixToolkit:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
         </HelixToolkit:HelixViewport3D>
         <Grid.Resources>

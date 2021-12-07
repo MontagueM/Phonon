@@ -4,5 +4,6 @@
              xmlns:local="clr-namespace:Phonon"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <local:MainViewModel x:Key="MainViewModel" />
     </Application.Resources>
 </Application>

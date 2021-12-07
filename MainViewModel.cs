@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Phonon
 {
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using System.Windows.Data;
     using System.Windows.Media;
     using System.Windows.Media.Media3D;
 
@@ -14,37 +17,62 @@ namespace Phonon
     /// <summary>
     /// Provides a ViewModel for the Main window.
     /// </summary>
-    public class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.
         /// </summary>
         public MainViewModel()
         {
-            // Create a model group
+            Dynamic dynamic = new Dynamic(0);
+            dynamic.Vertices = new List<float[]>();
+            dynamic.Faces = new List<uint[]>();
+            dynamic.ReadMeshData(dynamic.Vertices, dynamic.Faces);
+            UpdateModel(dynamic.Vertices, dynamic.Faces);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        //protected void OnPropertyChanged([CallerMemberName] string name = null)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        //}
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler == null) return;
+            handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public void UpdateModel(List<float[]> Vertices, List<uint[]> Faces)
+        {
             var modelGroup = new Model3DGroup();
+            MeshGeometry3D mesh = new MeshGeometry3D();
+            Int32Collection triangleIndices = new Int32Collection();
+            Point3DCollection positions = new Point3DCollection();
 
-            // Create a mesh builder and add a box to it
-            var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
-            meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
+            foreach (float[] v in Vertices)
+            {
+                Point3D p = new Point3D(v[0], v[1], v[2]);
+                positions.Add(p);
+            }
 
-            // Create a mesh from the builder (and freeze it)
-            var mesh = meshBuilder.ToMesh(true);
+            foreach (uint[] Face in Faces)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    triangleIndices.Add((int)Face[i]);
+                }
+            }
 
-            // Create some materials
-            var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
-            var redMaterial = MaterialHelper.CreateMaterial(Colors.Red);
-            var blueMaterial = MaterialHelper.CreateMaterial(Colors.Blue);
-            var insideMaterial = MaterialHelper.CreateMaterial(Colors.Yellow);
+            mesh.Positions = positions;
+            mesh.TriangleIndices = triangleIndices;
 
-            // Add 3 models to the group (using the same mesh, that's why we had to freeze it)
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Material = greenMaterial, BackMaterial = insideMaterial });
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(-2, 0, 0), Material = redMaterial, BackMaterial = insideMaterial });
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(2, 0, 0), Material = blueMaterial, BackMaterial = insideMaterial });
-            
-            // Set the property, which will be bound to the Content property of the ModelVisual3D (see MainWindow.xaml)
+            var Mat = MaterialHelper.CreateMaterial(Colors.White);
+            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = Mat, BackMaterial = Mat });
             this.Model = modelGroup;
+
+            OnPropertyChanged("Model");
         }
 
         /// <summary>
