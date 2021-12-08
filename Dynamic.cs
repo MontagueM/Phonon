@@ -19,12 +19,12 @@ namespace Phonon
         public List<float[]> Vertices;
         public List<uint[]> Faces;
 
-        public Dynamic(UInt32 DynamicHash)
+        public Dynamic(uint DynamicHash)
         {
             Hash = DynamicHash;
         }
 
-        static string LittleEndian(UInt32 number)
+        static string LittleEndian(uint number)
         {
             byte[] bytes = BitConverter.GetBytes(number);
             string retval = "";

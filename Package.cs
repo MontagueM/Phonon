@@ -68,7 +68,7 @@ namespace Phonon
         public string MakeName()
         {
             Name = Path.Split("\\").Last();
-            Name = Name.Substring(3, Name.Length - 9);
+            Name = Name.Substring(4, Name.Length - 10);
             return Name;
         }
 

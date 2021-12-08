@@ -22,18 +22,19 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="50*" />
         </Grid.RowDefinitions>
-        <Menu x:Name="menu" Grid.ColumnSpan="1" Grid.Column="1">
+        <Menu x:Name="menu" Grid.ColumnSpan="1" Grid.Column="1" Background="#3d3d3d" Foreground="#FFE6E6E6" BorderBrush="#3d3d3d">
             <MenuItem Header="_Viewer">
-                <MenuItem Header="G_rid" IsCheckable="True" IsChecked="True" Checked="Grid_Checked" Unchecked="Grid_Unchecked"/>
+                <MenuItem Header="G_rid" IsCheckable="True" IsChecked="True" Checked="Grid_Checked" Unchecked="Grid_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
             <MenuItem Header="E_xport">
-                <MenuItem Header="Set export path" Click="SetExportPath_Clicked"/>
-                <MenuItem Header="Export current model" Click="Export_Clicked"/>
+                <!-- <MenuItem Header="Set export path" Click="SetExportPath_Clicked" Background="#3d3d3d" Foreground="White"/> -->
+                <MenuItem Header="Export Textures" IsCheckable="True" IsChecked="True" Checked="ExportTextures_Checked" Unchecked="ExportTextures_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
+                <MenuItem Header="Export current model" Click="Export_Clicked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
         </Menu>
         <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="2">
             <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <Button x:Name="SelectPkgsDirectoryButton" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click"/>
+                <ToggleButton x:Name="SelectPkgsDirectoryButton" Style="{StaticResource ButtonStyle}" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click" Margin="0,512,0,0" Height="30" Width="150"/>
             </StackPanel>
         </ScrollViewer>
         <HelixToolkit:HelixViewport3D VerticalAlignment="Stretch" ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="False" CameraRotationMode="Turntable"  RotateAroundMouseDownPoint="False" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Grid.Row="1" Grid.Column="1">

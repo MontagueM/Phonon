@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:Phonon"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <local:MainViewModel x:Key="MainViewModel" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:MainViewModel x:Key="MainViewModel" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

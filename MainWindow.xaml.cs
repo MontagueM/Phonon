@@ -27,7 +27,7 @@ namespace Phonon
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
-        ExporterSettings ExportSettings = new ExporterSettings();
+        Exporter ExportSettings = new Exporter();
         public MainWindow()
         {
             InitializeComponent();
@@ -62,7 +62,7 @@ namespace Phonon
 
         private void PkgButton_Click(object sender, RoutedEventArgs e)
         {
-            string ClickedPackageName = (sender as System.Windows.Controls.Button).Content.ToString();
+            string ClickedPackageName = (((sender as ToggleButton).Content) as TextBlock).Text;
             Package pkg = Packages[ClickedPackageName];
             ShowDynamicList(pkg);
         }
@@ -81,6 +81,8 @@ namespace Phonon
             ToggleButton btn = new ToggleButton();
             btn.Content = "Go back to package list";
             btn.Padding = new Thickness(10, 5, 0, 5);
+            btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
+            btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
             btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
             PrimaryList.Children.Add(btn);
@@ -93,7 +95,11 @@ namespace Phonon
                     Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
                 };
-                btn.Padding = new Thickness(10, 10, 0, 10);
+                Style style = Application.Current.Resources["ButtonStyle"] as Style;
+                //btn.Style = style;
+                btn.Height = 40;
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
                 PrimaryList.Children.Add(btn);
@@ -109,7 +115,9 @@ namespace Phonon
             }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
-            Dynamic dynamic = new Dynamic(Convert.ToUInt32(ClickedDynamicHash, 16));
+            uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
+            ExportSettings.Hash = ClickedDynamicHash;
+            Dynamic dynamic = new Dynamic(h);
             dynamic.GetDynamicMesh(GetPackagesPath());
             MainViewModel MVM = (MainViewModel)Wind.Resources["MVM"];
             MVM.UpdateModel(dynamic.Vertices, dynamic.Faces);
@@ -281,13 +289,34 @@ namespace Phonon
             foreach (string PkgName in PackageNames)
             {
                 // We want to verify that this pkg has at least 1 dynamic model in it.
-                System.Windows.Controls.Button btn = new System.Windows.Controls.Button();
-                btn.Content = PkgName;
-                btn.Padding = new Thickness(10, 10, 0, 10);
+                ToggleButton btn = new ToggleButton();
+                btn.Content = new TextBlock
+                {
+                    Text = PkgName,
+                    TextWrapping = TextWrapping.Wrap,
+                }; ;
+                //Style style = Application.Current.Resources["ButtonStyle"] as Style;
+                //btn.Style = style;
+                //btn.Padding = new Thickness(10, 10, 0, 10);
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                //btn.MouseEnter += ButtonEnter; // this doesnt work for some reason
+                //btn.MouseLeave += ButtonLeave;
+                btn.Height = 40;
                 btn.Click += PkgButton_Click;
                 PrimaryList.Children.Add(btn);
             }
             ScrollView.ScrollToTop();
+        }
+
+        private void ButtonEnter(object sender, MouseEventArgs e)
+        {
+            (sender as ToggleButton).Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0));
+        }
+
+        private void ButtonLeave(object sender, MouseEventArgs e)
+        {
+            (sender as ToggleButton).Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
         }
 
         private bool SetPackagePath(string Path)
@@ -302,6 +331,7 @@ namespace Phonon
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             config.AppSettings.Settings.Remove("PackagesPath");
             config.AppSettings.Settings.Add("PackagesPath", Path);
+            config.Save(ConfigurationSaveMode.Minimal);
             return true;
         }
 
@@ -329,12 +359,12 @@ namespace Phonon
             }
         }
 
-        private void ExportTexture_Checked(object sender, RoutedEventArgs e)
+        private void ExportTextures_Checked(object sender, RoutedEventArgs e)
         {
             ExportSettings.bTextures = true;
         }
 
-        private void ExportTexture_Unchecked(object sender, RoutedEventArgs e)
+        private void ExportTextures_Unchecked(object sender, RoutedEventArgs e)
         {
             ExportSettings.bTextures = false;
         }
@@ -363,8 +393,27 @@ namespace Phonon
 
         private void Export_Clicked(object sender, RoutedEventArgs e)
         {
-            //Dynamic dynamic = new Dynamic(Convert.ToUInt32(ClickedDynamicHash, 16));
-            //dynamic.Export(ExportSettings);
+            if (ExportSettings.Hash == "")
+            {
+                System.Windows.MessageBox.Show("No dynamic model selected");
+                return;
+            }
+            using (var dialog = new System.Windows.Forms.SaveFileDialog())
+            {
+                dialog.Filter = "Model files | *.fbx";
+                dialog.DefaultExt = "fbx";
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                ExportSettings.Path = dialog.FileName;
+            }
+            bool status = ExportSettings.Export(GetPackagesPath());
+            if (status)
+            {
+                System.Windows.MessageBox.Show("Export success");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Export failed");
+            }
         }
     }
 
