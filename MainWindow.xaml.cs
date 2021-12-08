@@ -276,11 +276,13 @@ namespace Phonon
         private void ShowPackageList()
         {
             PrimaryList.Children.Clear();
-            foreach (Package pkg in Packages.Values)
+            List<string> PackageNames = Packages.Keys.ToList<string>();
+            PackageNames.Sort();
+            foreach (string PkgName in PackageNames)
             {
                 // We want to verify that this pkg has at least 1 dynamic model in it.
                 System.Windows.Controls.Button btn = new System.Windows.Controls.Button();
-                btn.Content = pkg.Name;
+                btn.Content = PkgName;
                 btn.Padding = new Thickness(10, 10, 0, 10);
                 btn.Click += PkgButton_Click;
                 PrimaryList.Children.Add(btn);
