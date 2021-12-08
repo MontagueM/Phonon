@@ -17,7 +17,7 @@ Do not run Destiny 2 at the same time as booting Phonon for the first time.
 
 You won't get banned but if they try to read the same package Phonon will not like it.
 
-* Download the latest release and run Phonon. 
+* Download the [latest release](https://github.com/MontagueM/Phonon/releases/latest/) and run Phonon. 
 * You'll need .NET 5.0 installed but most people have that.
 * Once it's open select your Destiny 2/packages/ directory. It will tell you if it's wrong.
 * Phonon will freeze for a bit after that to generate content manifest which is a one-time-per-update thing.
