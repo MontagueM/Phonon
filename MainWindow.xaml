@@ -6,7 +6,7 @@
         xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:local="clr-namespace:Phonon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" Name="Wind">
+        Title="Phonon" Height="1080" Width="1920" Name="Wind">
     <Window.Resources>
         <local:MainViewModel x:Key="MVM"/>
     </Window.Resources>
@@ -14,15 +14,32 @@
         <Binding Source="{StaticResource MVM}"/>
     </Window.DataContext>
     <Grid>
-        <ScrollViewer Margin="0,0,1559,0" Background="#3d3d3d" Name="ScrollView">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="5*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="50*" />
+        </Grid.RowDefinitions>
+        <Menu x:Name="menu" Grid.ColumnSpan="1" Grid.Column="1">
+            <MenuItem Header="_Viewer">
+                <MenuItem Header="G_rid" IsCheckable="True" IsChecked="True" Checked="Grid_Checked" Unchecked="Grid_Unchecked"/>
+            </MenuItem>
+            <MenuItem Header="E_xport">
+                <MenuItem Header="Set export path" Click="SetExportPath_Clicked"/>
+                <MenuItem Header="Export current model" Click="Export_Clicked"/>
+            </MenuItem>
+        </Menu>
+        <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="2">
             <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Button x:Name="SelectPkgsDirectoryButton" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click"/>
             </StackPanel>
         </ScrollViewer>
-        <HelixToolkit:HelixViewport3D ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="True" RotateAroundMouseDownPoint="True" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Margin="344,0,0,0">
+        <HelixToolkit:HelixViewport3D VerticalAlignment="Stretch" ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="False" CameraRotationMode="Turntable"  RotateAroundMouseDownPoint="False" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Grid.Row="1" Grid.Column="1">
             <HelixToolkit:SunLight/>
             <ModelVisual3D x:Name="Yoo" Content="{Binding Model, UpdateSourceTrigger=PropertyChanged}" />
-            <HelixToolkit:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
+            <HelixToolkit:GridLinesVisual3D x:Name="HelixGrid" Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
         </HelixToolkit:HelixViewport3D>
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

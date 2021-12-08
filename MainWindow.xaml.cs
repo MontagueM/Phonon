@@ -27,6 +27,7 @@ namespace Phonon
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
+        ExporterSettings ExportSettings = new ExporterSettings();
         public MainWindow()
         {
             InitializeComponent();
@@ -135,6 +136,8 @@ namespace Phonon
             {
                 GeneratePackageList();
                 SavePackageList();
+                Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+                config.Save(ConfigurationSaveMode.Minimal);
             }
         }
         private bool ParsePackageList()
@@ -193,6 +196,7 @@ namespace Phonon
             // First get the dictionary of name : highest patch pkg
             foreach (string file in files)
             {
+                if (!file.EndsWith(".pkg")) continue;
                 Package pkg = new Package(file);
                 if (!Packages.ContainsKey(pkg.Name))
                 {
@@ -296,7 +300,6 @@ namespace Phonon
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             config.AppSettings.Settings.Remove("PackagesPath");
             config.AppSettings.Settings.Add("PackagesPath", Path);
-            config.Save(ConfigurationSaveMode.Minimal);
             return true;
         }
 
@@ -304,6 +307,62 @@ namespace Phonon
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             return config.AppSettings.Settings["PackagesPath"].Value.ToString();
+        }
+
+        // Menu buttons
+
+        private void Grid_Checked(object sender, RoutedEventArgs e)
+        {
+            if (HelixGrid != null)
+            {
+                HelixGrid.Visible = true;
+            }
+        }
+
+        private void Grid_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (HelixGrid != null)
+            {
+                HelixGrid.Visible = false;
+            }
+        }
+
+        private void ExportTexture_Checked(object sender, RoutedEventArgs e)
+        {
+            ExportSettings.bTextures = true;
+        }
+
+        private void ExportTexture_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ExportSettings.bTextures = false;
+        }
+
+        private void SetExportPath_Clicked(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                bool success = SetExportPath(dialog.SelectedPath);
+                if (success)
+                {
+                    System.Windows.MessageBox.Show("Export path successfully set");
+                }
+            }
+        }
+
+        private bool SetExportPath(string Path)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+            config.AppSettings.Settings.Remove("ExportPath");
+            config.AppSettings.Settings.Add("ExportPath", Path);
+            config.Save(ConfigurationSaveMode.Minimal);
+            return true;
+        }
+
+        private void Export_Clicked(object sender, RoutedEventArgs e)
+        {
+            //Dynamic dynamic = new Dynamic(Convert.ToUInt32(ClickedDynamicHash, 16));
+            //dynamic.Export(ExportSettings);
         }
     }
 
