@@ -29,3 +29,9 @@ You won't get banned but if they try to read the same package Phonon will not li
 I'll list any common errors that appear here and how to fix them. Please raise any new issues in the Issues tab.
 
 For now the safest thing to do if you encounter any error is to delete the whole program and redownload.
+
+## What does Phonon mean
+
+I wrote Phonon in a couple days procrastinating my solid state physics lectures, and the last thing I covered was phonons. 
+
+It's basically just a term for vibrating atoms, and yes I had to google that.
