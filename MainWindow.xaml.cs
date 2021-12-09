@@ -97,7 +97,7 @@ namespace Phonon
                 };
                 Style style = Application.Current.Resources["ButtonStyle"] as Style;
                 //btn.Style = style;
-                btn.Height = 40;
+                btn.Height = 70;
                 btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
                 btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
@@ -115,6 +115,7 @@ namespace Phonon
             }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
+            System.Diagnostics.Debug.WriteLine("Clicked " + ClickedDynamicHash);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
             ExportSettings.Hash = ClickedDynamicHash;
             Dynamic dynamic = new Dynamic(h);
@@ -204,7 +205,7 @@ namespace Phonon
             // First get the dictionary of name : highest patch pkg
             foreach (string file in files)
             {
-                if (!file.EndsWith(".pkg")) continue;
+                if (!file.EndsWith(".pkg") || file.Contains("audio") || file.Contains("investment")) continue;
                 Package pkg = new Package(file);
                 if (!Packages.ContainsKey(pkg.Name))
                 {
@@ -220,16 +221,16 @@ namespace Phonon
             }
             foreach (Package pkg in Packages.Values.ToList())
             {
-                ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
-                //ThreadProc(pkg);
+                //ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
+                ThreadProc(pkg);
             }
             int workerThreads = 0; int completionPortThreads = 0; int maxWorkerThreads = 0; int maxCompletionPortThreads = 0;
             ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxCompletionPortThreads);
-            while (workerThreads != maxWorkerThreads)
-            {
-                ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-                continue;
-            }
+            //while (workerThreads != maxWorkerThreads)
+            //{
+            //    ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+            //    continue;
+            //}
             System.Diagnostics.Debug.WriteLine("Finished generation");
         }
 
@@ -258,11 +259,11 @@ namespace Phonon
             Handle.Close();
         }
 
-        private void ThreadProc(object state)
-        //private void ThreadProc(Package pkg)
+        //private void ThreadProc(object state)
+        private void ThreadProc(Package pkg)
         {
-            object[] array = state as object[];
-            Package pkg = (Package)array[0];
+            //object[] array = state as object[];
+            //Package pkg = (Package)array[0];
             //if (pkg.Header.PkgID != 0x2f0)
             //{
             //    Packages.TryRemove(pkg.Name, out pkg);

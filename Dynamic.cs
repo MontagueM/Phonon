@@ -66,7 +66,6 @@ namespace Phonon
             BinaryReader Handle = new BinaryReader(File.Open("msh.tmp", FileMode.Open));
             // We'll import it as one big mesh
             uint FaceCounter = 0;
-            int q = 0;
             while (Handle.BaseStream.Position != Handle.BaseStream.Length)
             {
                 uint VertexCount = Handle.ReadUInt32();

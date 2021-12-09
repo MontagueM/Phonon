@@ -109,13 +109,13 @@ namespace Phonon
                 return;
             }
             Header = new PkgHeader();
-            Handle.BaseStream.Seek(0x10, SeekOrigin.Begin);
+            Handle.BaseStream.Seek(0x04, SeekOrigin.Begin);
             Header.PkgID = Handle.ReadUInt16();
-            Handle.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            Handle.BaseStream.Seek(0x20, SeekOrigin.Begin);
             Header.PatchID = Handle.ReadUInt16();
-            Handle.BaseStream.Seek(0x44, SeekOrigin.Begin);
-            Header.EntryTableOffset = Handle.ReadUInt32();
-            Handle.BaseStream.Seek(0x60, SeekOrigin.Begin);
+            Handle.BaseStream.Seek(0x110, SeekOrigin.Begin);
+            Header.EntryTableOffset = Handle.ReadUInt32() + 96;
+            Handle.BaseStream.Seek(0xB4, SeekOrigin.Begin);
             Header.EntryTableCount = Handle.ReadUInt32();
         }
 
@@ -132,8 +132,9 @@ namespace Phonon
                 byte[] buffer = new byte[0x10];
                 Handle.BaseStream.Read(buffer, 0, 0x10);
                 NewPkgEntry = StructConverter.ToStructure<PkgEntry>(buffer);
-                if (NewPkgEntry.Reference == 0x80809AD8)
+                if (NewPkgEntry.Reference == 0x80809C0F)
                 {
+                    //System.Diagnostics.Debug.WriteLine("i: " + i + " Ref: " + NewPkgEntry.Reference + " Pkg: " + Header.PkgID + " Pkg entry offset: " + Header.EntryTableOffset);
                     DynamicHashIndices.Add(i);
                 }
             }
