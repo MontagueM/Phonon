@@ -1,4 +1,4 @@
-# Phonon for before Beyond Light!
+# Phonon
 
 ## What is this?
 
@@ -6,7 +6,7 @@ A GUI with similar functionality of the console application [MDE](https://github
 
 Current capability:
 
-* Works with packages before Beyond Light
+* Works with packages for Beyond Light and before Beyond Light
 * Scrolling through all dynamic models in the entire of Destiny 2
 * Exporting with option for name, folder, and texture extraction
 
@@ -24,6 +24,10 @@ You won't get banned but if they try to read the same package Phonon will not li
 * Phonon will freeze for a bit after that to generate content manifest which is a one-time-per-update thing.
 * After some time it should populate the left bar with a list of packages which can be selected to show their dynamics.
 * Exporting can be done by using the Export button on the menu bar.
+
+## How do I use it for before Beyond Light?
+
+Find a file called Phonon.exe.config or similar depending on the name of the executable. If the file does not exist make sure to run the program at least once before and generate the manifest for Beyond Light. You can then modify the key for "BeyondLight" from "True" to "False".
 
 ## How do I get the old packages?
 
