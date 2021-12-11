@@ -28,12 +28,47 @@ namespace Phonon
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
         Exporter ExportSettings = new Exporter();
+        bool bBeyondLight = true;
+        string PkgPathKey = "";
+        string PkgCacheName = "";
         public MainWindow()
         {
             InitializeComponent();
+            InitialiseConfig();
+
+        }
+
+        private void InitialiseConfig()
+        {
             // Check if we need to get the package path first
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            if (config.AppSettings.Settings["PackagesPath"] != null)
+            // Check what version to load (BL or pre-BL)
+
+            if (config.AppSettings.Settings["BeyondLight"] != null)
+            {
+                if (config.AppSettings.Settings["BeyondLight"].Value == false.ToString())
+                {
+                    bBeyondLight = false;
+                    Wind.Title = "Phonon PRE-BL";
+                }
+                else
+                {
+                    Wind.Title = "Phonon BL";
+                }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Defaulting to Beyond Light settings");
+                
+                config.AppSettings.Settings.Add("BeyondLight", true.ToString());
+                config.Save(ConfigurationSaveMode.Minimal);
+            }
+
+            PkgPathKey = bBeyondLight ? "PackagesPathBL" : "PackagesPathPREBL";
+            PkgCacheName = bBeyondLight ? "packagesBL.dat" : "packagesPREBL.dat";
+
+            // Check for package path and load the list
+            if (config.AppSettings.Settings[PkgPathKey] != null)
             {
                 SelectPkgsDirectoryButton.Visibility = Visibility.Hidden;
                 LoadPackageList();
@@ -97,7 +132,7 @@ namespace Phonon
                 };
                 Style style = Application.Current.Resources["ButtonStyle"] as Style;
                 //btn.Style = style;
-                btn.Height = 40;
+                btn.Height = 70;
                 btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
                 btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
@@ -115,10 +150,11 @@ namespace Phonon
             }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
+            System.Diagnostics.Debug.WriteLine("Clicked " + ClickedDynamicHash);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
             ExportSettings.Hash = ClickedDynamicHash;
             Dynamic dynamic = new Dynamic(h);
-            dynamic.GetDynamicMesh(GetPackagesPath());
+            dynamic.GetDynamicMesh(GetPackagesPath(), bBeyondLight);
             MainViewModel MVM = (MainViewModel)Wind.Resources["MVM"];
             MVM.UpdateModel(dynamic.Vertices, dynamic.Faces);
         }
@@ -130,7 +166,7 @@ namespace Phonon
 
         private void LoadPackageList()
         {
-            if (File.Exists("packages.dat"))
+            if (File.Exists(PkgCacheName))
             {
                 bool success = ParsePackageList();
                 if (!success) // TODO properly implement this, currently always returns true
@@ -150,14 +186,14 @@ namespace Phonon
         }
         private bool ParsePackageList()
         {
-            BinaryReader Handle = new BinaryReader(File.Open("packages.dat", FileMode.Open));
+            BinaryReader Handle = new BinaryReader(File.Open(PkgCacheName, FileMode.Open));
             // PkgID : Path dict
             IDictionary<int, Package> PackagePaths = new Dictionary<int, Package>();
             string[] files = Directory.GetFiles(GetPackagesPath(), "*.pkg", SearchOption.TopDirectoryOnly);
             // First get the dictionary of name : highest patch pkg
             foreach (string file in files)
             {
-                Package pkg = new Package(file);
+                Package pkg = new Package(file, bBeyondLight);
                 if (!PackagePaths.ContainsKey(pkg.Header.PkgID))
                 {
                     PackagePaths.Add(pkg.Header.PkgID, pkg);
@@ -173,7 +209,7 @@ namespace Phonon
 
             while (Handle.BaseStream.Position != Handle.BaseStream.Length)
             {
-                Package pkg = new Package();
+                Package pkg = new Package(bBeyondLight);
                 pkg.Header.PkgID = Handle.ReadUInt16();
                 pkg.Header.PatchID = Handle.ReadUInt16();
                 ushort DynamicCount = Handle.ReadUInt16();
@@ -204,8 +240,8 @@ namespace Phonon
             // First get the dictionary of name : highest patch pkg
             foreach (string file in files)
             {
-                if (!file.EndsWith(".pkg")) continue;
-                Package pkg = new Package(file);
+                if (!file.EndsWith(".pkg") || file.Contains("audio") || file.Contains("investment")) continue;
+                Package pkg = new Package(file, bBeyondLight);
                 if (!Packages.ContainsKey(pkg.Name))
                 {
                     Packages.AddOrUpdate(pkg.Name, pkg, (Key, OldValue) => OldValue);
@@ -220,22 +256,22 @@ namespace Phonon
             }
             foreach (Package pkg in Packages.Values.ToList())
             {
-                ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
-                //ThreadProc(pkg);
+                //ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
+                ThreadProc(pkg);
             }
             int workerThreads = 0; int completionPortThreads = 0; int maxWorkerThreads = 0; int maxCompletionPortThreads = 0;
             ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxCompletionPortThreads);
-            while (workerThreads != maxWorkerThreads)
-            {
-                ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-                continue;
-            }
+            //while (workerThreads != maxWorkerThreads)
+            //{
+            //    ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+            //    continue;
+            //}
             System.Diagnostics.Debug.WriteLine("Finished generation");
         }
 
         private void SavePackageList()
         {
-            BinaryWriter Handle = new BinaryWriter(File.Open("packages.dat", FileMode.Create));
+            BinaryWriter Handle = new BinaryWriter(File.Open(PkgCacheName, FileMode.Create));
             foreach (Package pkg in Packages.Values)
             {
                 Handle.Write(pkg.Header.PkgID);
@@ -258,11 +294,11 @@ namespace Phonon
             Handle.Close();
         }
 
-        private void ThreadProc(object state)
-        //private void ThreadProc(Package pkg)
+        //private void ThreadProc(object state)
+        private void ThreadProc(Package pkg)
         {
-            object[] array = state as object[];
-            Package pkg = (Package)array[0];
+            //object[] array = state as object[];
+            //Package pkg = (Package)array[0];
             //if (pkg.Header.PkgID != 0x2f0)
             //{
             //    Packages.TryRemove(pkg.Name, out pkg);
@@ -329,8 +365,8 @@ namespace Phonon
                 return false;
             }
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            config.AppSettings.Settings.Remove("PackagesPath");
-            config.AppSettings.Settings.Add("PackagesPath", Path);
+            config.AppSettings.Settings.Remove(PkgPathKey);
+            config.AppSettings.Settings.Add(PkgPathKey, Path);
             config.Save(ConfigurationSaveMode.Minimal);
             return true;
         }
@@ -338,7 +374,7 @@ namespace Phonon
         public string GetPackagesPath()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            return config.AppSettings.Settings["PackagesPath"].Value.ToString();
+            return config.AppSettings.Settings[PkgPathKey].Value.ToString();
         }
 
         // Menu buttons
@@ -405,7 +441,7 @@ namespace Phonon
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
                 ExportSettings.Path = dialog.FileName;
             }
-            bool status = ExportSettings.Export(GetPackagesPath());
+            bool status = ExportSettings.Export(GetPackagesPath(), bBeyondLight);
             if (status)
             {
                 System.Windows.MessageBox.Show("Export success");

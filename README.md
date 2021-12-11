@@ -1,4 +1,4 @@
-# Phonon
+# Phonon for before Beyond Light!
 
 ## What is this?
 
@@ -6,6 +6,7 @@ A GUI with similar functionality of the console application [MDE](https://github
 
 Current capability:
 
+* Works with packages before Beyond Light
 * Scrolling through all dynamic models in the entire of Destiny 2
 * Exporting with option for name, folder, and texture extraction
 
@@ -18,11 +19,24 @@ Do not run Destiny 2 at the same time as booting Phonon for the first time.
 You won't get banned but if they try to read the same package Phonon will not like it.
 
 * Download the [latest release](https://github.com/MontagueM/Phonon/releases/latest/) and run Phonon. 
-* You'll need .NET 5.0 installed but most people have that.
+* You'll need [.NET 5.0 x64](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-5.0.12-windows-x64-installer) installed but most people have that.
 * Once it's open select your Destiny 2/packages/ directory. It will tell you if it's wrong.
 * Phonon will freeze for a bit after that to generate content manifest which is a one-time-per-update thing.
 * After some time it should populate the left bar with a list of packages which can be selected to show their dynamics.
 * Exporting can be done by using the Export button on the menu bar.
+
+## How do I get the old packages?
+
+Guide from nblock:
+
+* You need to acquire .NET Core from Microsoft's website, make sure to download the correct version for your operating system (Windows x64 for most users, but please check this).
+* Download the DepotDownloader tool from github (https://github.com/SteamRE/DepotDownloader/releases) and extract it somewhere you'll remember.
+* Open the folder containing "DepotDownloader.dll", type "cmd.exe" into the address bar and press enter to launch command line from that location.
+* Now you can enter the commands below to download the downpatched files for whichever Destiny version you need. You can get the appid, depotid and manifest # from a site like https://steamdb.info/, as well as replacing <username> with your steam account's details. It'll ask for your password and if you have Steam Guard active you will be prompted for the code like usual.
+
+  dotnet DepotDownloader.dll -app <#> -depot <#> -manifest <id> -username <user>
+
+ The recommended app and depot is app=1085661, depot=589374386951979820. This equates to the game version 2.9.2.2.
 
 ## Errors
 

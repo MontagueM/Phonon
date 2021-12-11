@@ -16,14 +16,27 @@ namespace Phonon
         {
 
         }
-        public bool Export(string PackagesPath)
+        public bool Export(string PackagesPath, bool bBeyondLight)
         {
             string[] s = Path.Split("\\");
             string SavePath = String.Join("/", s);
             string SaveName = s.Last().Split(".")[0];
-            [DllImport(@"DestinyDynamicExtractor.dll")]
-            static extern bool RequestExportDynamic([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
-            bool status = RequestExportDynamic(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+
+            [DllImport("DestinyDynamicExtractorBL.dll", EntryPoint = "RequestExportDynamic")]
+            static extern bool RequestExportDynamicBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+            [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestExportDynamic")]
+            static extern bool RequestExportDynamicPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+
+            bool status = false;
+            if (bBeyondLight)
+            {
+                status = RequestExportDynamicBL(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+            }
+            else
+            {
+                status = RequestExportDynamicPREBL(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+            }
+
             return status;
         }
     }
