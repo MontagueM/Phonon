@@ -39,25 +39,48 @@ namespace Phonon
             return HashString;
         }
 
-        public bool GetDynamicInfo(string PackagesPath)
+        public bool GetDynamicInfo(string PackagesPath, bool bBeyondLight)
         {
             GetHashString();
             // TODO do this on a separate thread as to not lag the UI
             bool status = false;
-            [DllImport(@"DestinyDynamicExtractor.dll")]
-            static extern bool RequestDynamicInformation([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
-            status = RequestDynamicInformation(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
+
+            [DllImport("DestinyDynamicExtractorBL.dll", EntryPoint="RequestDynamicInformation")]
+            static extern bool RequestDynamicInformationBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
+
+            [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestDynamicInformation")]
+            static extern bool RequestDynamicInformationPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
+            if (bBeyondLight)
+            {
+                status = RequestDynamicInformationBL(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
+
+            }
+            else
+            {
+                status = RequestDynamicInformationPREBL(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
+            }
             return status && (MeshCount > 0);
         }
 
-        public bool GetDynamicMesh(string PackagesPath)
+        public bool GetDynamicMesh(string PackagesPath, bool bBeyondLight)
         {
             Vertices = new List<float[]>();
             Faces = new List<uint[]>();
-            [DllImport(@"DestinyDynamicExtractor.dll")]
-            static extern bool RequestSaveDynamicMeshData([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
+            [DllImport("DestinyDynamicExtractorBL.dll", EntryPoint = "RequestSaveDynamicMeshData")]
+            static extern bool RequestSaveDynamicMeshDataBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
+            [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestSaveDynamicMeshData")]
+            static extern bool RequestSaveDynamicMeshDataPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
+
             var a = Hash.ToString("X8");
-            bool status = RequestSaveDynamicMeshData(a, PackagesPath);
+            bool status = false;
+            if (bBeyondLight)
+            {
+                status = RequestSaveDynamicMeshDataBL(a, PackagesPath);
+            }
+            else
+            {
+                status = RequestSaveDynamicMeshDataPREBL(a, PackagesPath);
+            }
             return ReadMeshData(Vertices, Faces) && status;
         }
 
@@ -68,7 +91,18 @@ namespace Phonon
             uint FaceCounter = 0;
             while (Handle.BaseStream.Position != Handle.BaseStream.Length)
             {
-                uint VertexCount = Handle.ReadUInt32();
+                uint VertexCount = 0;
+                try
+                {
+                    VertexCount = Handle.ReadUInt32();
+                }
+                catch (System.IO.EndOfStreamException e)
+                {
+                    System.Windows.MessageBox.Show("Mesh file broken, deleting");
+                    Handle.Close();
+                    File.Delete("msh.tmp");
+                    return false;
+                }
                 for (int i = 0; i < VertexCount; i++)
                 {
                     float[] Vertex = new float[3];
