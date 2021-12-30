@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -24,11 +25,23 @@ namespace Phonon
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+
+    public enum PhononType
+    {
+        [Description("Destiny1")]
+        Destiny1 = 1,
+        [Description("Destiny2PREBL")]
+        Destiny2PREBL = 2,
+        [Description("Destiny2BL")]
+        Destiny2BL = 3,
+    }
+
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
         Exporter ExportSettings = new Exporter();
-        bool bBeyondLight = true;
+        PhononType ePhononType = PhononType.Destiny2BL;
         string PkgPathKey = "";
         string PkgCacheName = "";
         public MainWindow()
@@ -44,28 +57,49 @@ namespace Phonon
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             // Check what version to load (BL or pre-BL)
 
-            if (config.AppSettings.Settings["BeyondLight"] != null)
+            if (config.AppSettings.Settings["Version"] != null)
             {
-                if (config.AppSettings.Settings["BeyondLight"].Value == false.ToString())
+                if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2BL.ToString())
                 {
-                    bBeyondLight = false;
+                    ePhononType = PhononType.Destiny2BL;
+                    Wind.Title = "Phonon BL";
+                    PkgPathKey = "PackagesPathBL";
+                    PkgCacheName = "packagesBL.dat";
+
+                }
+                else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2PREBL.ToString())
+                {
+                    ePhononType = PhononType.Destiny2PREBL;
                     Wind.Title = "Phonon PRE-BL";
+                    PkgPathKey = "PackagesPathPREBL";
+                    PkgCacheName = "packagesPREBL.dat";
+                }
+                else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny1.ToString())
+                {
+                    ePhononType = PhononType.Destiny1;
+                    Wind.Title = "Phonon D1";
+                    PkgPathKey = "PackagesPathD1";
+                    PkgCacheName = "packagesD1.dat";
                 }
                 else
                 {
+                    System.Windows.MessageBox.Show("Incorrect value set for 'Version', defaulting to Beyond Light settings");
+                    ePhononType = PhononType.Destiny2BL;
                     Wind.Title = "Phonon BL";
+                    PkgPathKey = "PackagesPathBL";
+                    PkgCacheName = "packagesBL.dat";
                 }
             }
             else
             {
                 System.Windows.MessageBox.Show("Defaulting to Beyond Light settings");
-                
-                config.AppSettings.Settings.Add("BeyondLight", true.ToString());
+                ePhononType = PhononType.Destiny2BL;
+                Wind.Title = "Phonon BL";
+                PkgPathKey = "PackagesPathBL";
+                PkgCacheName = "packagesBL.dat";
+                config.AppSettings.Settings.Add("Version", PhononType.Destiny2BL.ToString());
                 config.Save(ConfigurationSaveMode.Minimal);
             }
-
-            PkgPathKey = bBeyondLight ? "PackagesPathBL" : "PackagesPathPREBL";
-            PkgCacheName = bBeyondLight ? "packagesBL.dat" : "packagesPREBL.dat";
 
             // Check for package path and load the list
             if (config.AppSettings.Settings[PkgPathKey] != null)
@@ -76,7 +110,7 @@ namespace Phonon
             }
             else
             {
-                System.Windows.MessageBox.Show("No package path found");
+                System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
             }
         }
 
@@ -150,11 +184,12 @@ namespace Phonon
             }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
-            System.Diagnostics.Debug.WriteLine("Clicked " + ClickedDynamicHash);
+            System.Diagnostics.Debug.WriteLine($"Clicked {ClickedDynamicHash}");
+            File.AppendAllText("debug_phonon.log", $"Clicked { ClickedDynamicHash}" + Environment.NewLine);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
             ExportSettings.Hash = ClickedDynamicHash;
             Dynamic dynamic = new Dynamic(h);
-            dynamic.GetDynamicMesh(GetPackagesPath(), bBeyondLight);
+            dynamic.GetDynamicMesh(GetPackagesPath(), ePhononType);
             MainViewModel MVM = (MainViewModel)Wind.Resources["MVM"];
             MVM.UpdateModel(dynamic.Vertices, dynamic.Faces);
         }
@@ -193,7 +228,7 @@ namespace Phonon
             // First get the dictionary of name : highest patch pkg
             foreach (string file in files)
             {
-                Package pkg = new Package(file, bBeyondLight);
+                Package pkg = new Package(file, ePhononType);
                 if (!PackagePaths.ContainsKey(pkg.Header.PkgID))
                 {
                     PackagePaths.Add(pkg.Header.PkgID, pkg);
@@ -209,7 +244,7 @@ namespace Phonon
 
             while (Handle.BaseStream.Position != Handle.BaseStream.Length)
             {
-                Package pkg = new Package(bBeyondLight);
+                Package pkg = new Package(ePhononType);
                 pkg.Header.PkgID = Handle.ReadUInt16();
                 pkg.Header.PatchID = Handle.ReadUInt16();
                 ushort DynamicCount = Handle.ReadUInt16();
@@ -241,7 +276,7 @@ namespace Phonon
             foreach (string file in files)
             {
                 if (!file.EndsWith(".pkg") || file.Contains("audio") || file.Contains("investment")) continue;
-                Package pkg = new Package(file, bBeyondLight);
+                Package pkg = new Package(file, ePhononType);
                 if (!Packages.ContainsKey(pkg.Name))
                 {
                     Packages.AddOrUpdate(pkg.Name, pkg, (Key, OldValue) => OldValue);
@@ -441,7 +476,7 @@ namespace Phonon
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
                 ExportSettings.Path = dialog.FileName;
             }
-            bool status = ExportSettings.Export(GetPackagesPath(), bBeyondLight);
+            bool status = ExportSettings.Export(GetPackagesPath(), ePhononType);
             if (status)
             {
                 System.Windows.MessageBox.Show("Export success");

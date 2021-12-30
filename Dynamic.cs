@@ -39,7 +39,7 @@ namespace Phonon
             return HashString;
         }
 
-        public bool GetDynamicInfo(string PackagesPath, bool bBeyondLight)
+        public bool GetDynamicInfo(string PackagesPath, PhononType ePhononType)
         {
             GetHashString();
             // TODO do this on a separate thread as to not lag the UI
@@ -47,22 +47,29 @@ namespace Phonon
 
             [DllImport("DestinyDynamicExtractorBL.dll", EntryPoint="RequestDynamicInformation")]
             static extern bool RequestDynamicInformationBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
-
             [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestDynamicInformation")]
             static extern bool RequestDynamicInformationPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
-            if (bBeyondLight)
+            [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestDynamicInformation")]
+            static extern bool RequestDynamicInformationD1([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, ref int MeshCount, ref bool bHasSkeleton);
+
+
+            if (ePhononType == PhononType.Destiny2BL)
             {
                 status = RequestDynamicInformationBL(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
 
             }
-            else
+            else if (ePhononType == PhononType.Destiny2PREBL)
             {
                 status = RequestDynamicInformationPREBL(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
+            }
+            else if (ePhononType == PhononType.Destiny1)
+            {
+                status = RequestDynamicInformationD1(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
             }
             return status && (MeshCount > 0);
         }
 
-        public bool GetDynamicMesh(string PackagesPath, bool bBeyondLight)
+        public bool GetDynamicMesh(string PackagesPath, PhononType ePhononType)
         {
             Vertices = new List<float[]>();
             Faces = new List<uint[]>();
@@ -70,16 +77,23 @@ namespace Phonon
             static extern bool RequestSaveDynamicMeshDataBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
             [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestSaveDynamicMeshData")]
             static extern bool RequestSaveDynamicMeshDataPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
+            [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestSaveDynamicMeshData")]
+            static extern bool RequestSaveDynamicMeshDataD1([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath);
 
             var a = Hash.ToString("X8");
             bool status = false;
-            if (bBeyondLight)
+            if (ePhononType == PhononType.Destiny2BL)
             {
                 status = RequestSaveDynamicMeshDataBL(a, PackagesPath);
+
             }
-            else
+            else if (ePhononType == PhononType.Destiny2PREBL)
             {
                 status = RequestSaveDynamicMeshDataPREBL(a, PackagesPath);
+            }
+            else if (ePhononType == PhononType.Destiny1)
+            {
+                status = RequestSaveDynamicMeshDataD1(a, PackagesPath);
             }
             return ReadMeshData(Vertices, Faces) && status;
         }

@@ -51,16 +51,16 @@ namespace Phonon
         public PkgHeader Header;
         private List<int> DynamicHashIndices;
         public List<Dynamic> Dynamics;
-        public bool bBeyondLight = true;
+        public PhononType ePhononType;
 
-        public Package(bool bIsBeyondLight)
+        public Package(PhononType ePhononType)
         {
-            bBeyondLight = bIsBeyondLight;
+            this.ePhononType = ePhononType;
         }
-        public Package(string PkgPath, bool bIsBeyondLight)
+        public Package(string PkgPath, PhononType ePhononType)
         {
             Path = PkgPath;
-            bBeyondLight = bIsBeyondLight;
+            this.ePhononType = ePhononType;
             MakeName();
             GetHandle();
             ReadHeader();
@@ -80,7 +80,7 @@ namespace Phonon
             foreach(int DynamicHashIndex in DynamicHashIndices)
             {
                 Dynamic dynamic = new Dynamic((UInt32)(0x80800000 + DynamicHashIndex + Header.PkgID * 8192));
-                bool success = dynamic.GetDynamicInfo(PackagesPath, bBeyondLight);
+                bool success = dynamic.GetDynamicInfo(PackagesPath, ePhononType);
                 if (success)
                 {
                     Dynamics.Add(dynamic);
@@ -111,7 +111,7 @@ namespace Phonon
                 return;
             }
             Header = new PkgHeader();
-            if (bBeyondLight)
+            if (ePhononType == PhononType.Destiny2BL)
             {
                 Handle.BaseStream.Seek(0x10, SeekOrigin.Begin);
                 Header.PkgID = Handle.ReadUInt16();
@@ -122,7 +122,7 @@ namespace Phonon
                 Handle.BaseStream.Seek(0x60, SeekOrigin.Begin);
                 Header.EntryTableCount = Handle.ReadUInt32();
             }
-            else
+            else if (ePhononType == PhononType.Destiny2PREBL)
             {
                 Handle.BaseStream.Seek(0x04, SeekOrigin.Begin);
                 Header.PkgID = Handle.ReadUInt16();
@@ -133,7 +133,17 @@ namespace Phonon
                 Handle.BaseStream.Seek(0xB4, SeekOrigin.Begin);
                 Header.EntryTableCount = Handle.ReadUInt32();
             }
-
+            else if (ePhononType == PhononType.Destiny1)
+            {
+                Handle.BaseStream.Seek(0x04, SeekOrigin.Begin);
+                Header.PkgID = Handle.ReadUInt16();
+                Handle.BaseStream.Seek(0x20, SeekOrigin.Begin);
+                Header.PatchID = Handle.ReadUInt16();
+                Handle.BaseStream.Seek(0xB8, SeekOrigin.Begin);
+                Header.EntryTableOffset = Handle.ReadUInt32();
+                Handle.BaseStream.Seek(0xB4, SeekOrigin.Begin);
+                Header.EntryTableCount = Handle.ReadUInt32();
+            }
         }
 
         public bool GetDynamicIndices()
@@ -149,7 +159,19 @@ namespace Phonon
                 byte[] buffer = new byte[0x10];
                 Handle.BaseStream.Read(buffer, 0, 0x10);
                 NewPkgEntry = StructConverter.ToStructure<PkgEntry>(buffer);
-                uint DynamicRef = bBeyondLight ? 0x80809AD8 : 0x80809C0F;
+                uint DynamicRef = 0;
+                if (ePhononType == PhononType.Destiny2BL)
+                {
+                    DynamicRef = 0x80809AD8;
+                }
+                else if (ePhononType == PhononType.Destiny2PREBL)
+                {
+                    DynamicRef = 0x80809C0F;
+                }
+                else if (ePhononType == PhononType.Destiny1)
+                {
+                    DynamicRef = 0x80800734;
+                }
                 if (NewPkgEntry.Reference == DynamicRef)
                 {
                     //System.Diagnostics.Debug.WriteLine("i: " + i + " Ref: " + NewPkgEntry.Reference + " Pkg: " + Header.PkgID + " Pkg entry offset: " + Header.EntryTableOffset);
