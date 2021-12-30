@@ -46,6 +46,8 @@ Guide from nblock:
 
 To use the Destiny 1 version, open the config file and change the key "Value" from "Destiny2BL"/"Destiny2PREBL" to "Destiny1". To access the packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
 
+Thanks to Philip for help with textures swizzling for PS4.
+
 ## Errors
 
 I'll list any common errors that appear here and how to fix them. Please raise any new issues in the Issues tab.
