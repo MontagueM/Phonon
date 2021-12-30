@@ -27,7 +27,7 @@ You won't get banned but if they try to read the same package Phonon will not li
 
 ## How do I use it for before Beyond Light?
 
-Find a file called Phonon.exe.config or similar depending on the name of the executable. If the file does not exist make sure to run the program at least once before and generate the manifest for Beyond Light. You can then modify the key for "BeyondLight" from "True" to "False".
+Find a file called Phonon.exe.config or similar depending on the name of the executable. If the file does not exist make sure to run the program at least once before so it opens. You can then close it and open the config file, changing the key "Value" from "Destiny2BL" to "Destiny2PREBL".
 
 ## How do I get the old packages?
 
@@ -41,6 +41,10 @@ Guide from nblock:
   dotnet DepotDownloader.dll -app <#> -depot <#> -manifest <id> -username <user>
 
  The recommended app and depot is app=1085661, depot=589374386951979820. This equates to the game version 2.9.2.2.
+
+## Destiny 1
+
+To use the Destiny 1 version, open the config file and change the key "Value" from "Destiny2BL"/"Destiny2PREBL" to "Destiny1". To access the packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
 
 ## Errors
 
