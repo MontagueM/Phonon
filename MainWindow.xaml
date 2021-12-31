@@ -15,14 +15,16 @@
     </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="41*" />
+            <ColumnDefinition Width="39*"/>
+            <ColumnDefinition Width="400*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="50*" />
+            <RowDefinition Height="21*" />
+            <RowDefinition Height="523*" />
+            <RowDefinition Height="520*"/>
         </Grid.RowDefinitions>
-        <Menu x:Name="menu" Grid.ColumnSpan="1" Grid.Column="1" Background="#3d3d3d" Foreground="#FFE6E6E6" BorderBrush="#3d3d3d">
+        <Menu x:Name="menu" Grid.ColumnSpan="1" Grid.Column="2" Background="#3d3d3d" Foreground="#FFE6E6E6" BorderBrush="#3d3d3d">
             <MenuItem Header="_Viewer">
                 <MenuItem Header="G_rid" IsCheckable="True" IsChecked="True" Checked="Grid_Checked" Unchecked="Grid_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
@@ -31,13 +33,21 @@
                 <MenuItem Header="Export Textures" IsCheckable="True" IsChecked="True" Checked="ExportTextures_Checked" Unchecked="ExportTextures_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
                 <MenuItem Header="Export current model" Click="Export_Clicked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
+            <MenuItem Header="Version"> <!-- cant customize radio buttons? -->
+                <RadioButton x:Name="Destiny1" Margin="5" Checked="HandleVersionCheck" Content="D1"  />
+                <RadioButton x:Name="Destiny2BL" Margin="5" Checked="HandleVersionCheck" Content="D2 BL" />
+                <RadioButton x:Name="Destiny2PreBL" Margin="5" Checked="HandleVersionCheck" Content="D2 Pre-BL" />
+            </MenuItem>
         </Menu>
-        <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="2">
-            <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+        <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="3" HorizontalAlignment="Center" Width="320" Grid.ColumnSpan="2" Focusable="False" >
+            <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Focusable="false">
                 <ToggleButton x:Name="SelectPkgsDirectoryButton" Style="{StaticResource ButtonStyle}" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click" Margin="0,512,0,0" Height="30" Width="150"/>
             </StackPanel>
+            
         </ScrollViewer>
-        <HelixToolkit:HelixViewport3D VerticalAlignment="Stretch" ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="False" CameraRotationMode="Turntable"  RotateAroundMouseDownPoint="False" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Grid.Row="1" Grid.Column="1">
+        
+        <HelixToolkit:HelixViewport3D ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="False" CameraRotationMode="Turntable"  RotateAroundMouseDownPoint="False" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Grid.Row="1" Grid.Column="2" Grid.RowSpan="2">
             <HelixToolkit:SunLight/>
             <ModelVisual3D x:Name="Yoo" Content="{Binding Model, UpdateSourceTrigger=PropertyChanged}" />
             <HelixToolkit:GridLinesVisual3D x:Name="HelixGrid" Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
@@ -260,3 +270,5 @@
         </Grid.Resources>
     </Grid>
 </Window>
+
+    
