@@ -274,6 +274,7 @@ namespace Phonon
             IDictionary<int, Package> PackagePaths = new Dictionary<int, Package>();
             string[] files = Directory.GetFiles(GetPackagesPath(), "*.pkg", SearchOption.TopDirectoryOnly);
             // First get the dictionary of name : highest patch pkg
+            
             foreach (string file in files)
             {
                 Package pkg = new Package(file, ePhononType);
@@ -403,6 +404,7 @@ namespace Phonon
         private void ShowPackageList()
         {
             PrimaryList.Children.Clear();
+            
             List<string> PackageNames = Packages.Keys.ToList<string>();
             PackageNames.Sort();
 
@@ -511,6 +513,58 @@ namespace Phonon
             config.AppSettings.Settings.Add("ExportPath", Path);
             config.Save(ConfigurationSaveMode.Minimal);
             return true;
+        }
+
+        private void HandleVersionCheck(object sender, RoutedEventArgs e) //Changes Version based on selected radio button
+        {
+            RadioButton rb = sender as RadioButton;
+            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+           
+            //Probably could've used a switch here instead
+            if (rb.Name == "Destiny1")
+            {
+                config.AppSettings.Settings["Version"].Value = PhononType.Destiny1.ToString();
+                ePhononType = PhononType.Destiny1;
+                Wind.Title = "Phonon D1";
+                PkgPathKey = "PackagesPathD1";
+                PkgCacheName = "packagesD1.dat";
+               
+            }
+            if (rb.Name == "Destiny2BL")
+            {
+                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
+                ePhononType = PhononType.Destiny2BL;
+                Wind.Title = "Phonon BL";
+                PkgPathKey = "PackagesPathBL";
+                PkgCacheName = "packagesBL.dat";
+               
+            }
+            if (rb.Name == "Destiny2PreBL")
+            {
+                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2PREBL.ToString();
+                ePhononType = PhononType.Destiny2PREBL;
+                Wind.Title = "Phonon PRE-BL";
+                PkgPathKey = "PackagesPathPREBL";
+                PkgCacheName = "packagesPREBL.dat";
+                
+            }
+            
+            config.Save(ConfigurationSaveMode.Minimal);
+
+            Packages.Clear();
+
+            if (config.AppSettings.Settings[PkgPathKey] != null)
+            {
+                LoadPackageList();
+                ShowPackageList();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
+                SelectPkgsDirectoryButton_Click(sender, e);
+            }
+            
+
         }
 
         private void Export_Clicked(object sender, RoutedEventArgs e)
