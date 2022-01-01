@@ -149,15 +149,19 @@ namespace Phonon
 
             // Go back
             ToggleButton btn = new ToggleButton();
+            Style style = Application.Current.Resources["Button_Command"] as Style;
 
+            btn.Style = style;
+            btn.HorizontalAlignment = HorizontalAlignment.Stretch;
+            btn.VerticalAlignment = VerticalAlignment.Center;
+            btn.Height = 40;
             btn.Focusable = false;
             btn.Content = "Go back to package list";
-            btn.Padding = new Thickness(10, 5, 0, 5);
-            btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-            btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+            btn.Padding = new Thickness(10,5,0,5);
+            btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+            btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
             btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
-            
 
             PrimaryList.Children.Add(btn);
 
@@ -166,19 +170,20 @@ namespace Phonon
                 int btnNum = 0;
                 btn = new ToggleButton();
                 btn.Focusable = true;
-                
                
                 btn.Content = new TextBlock
                 {
                     Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13
                 };
                 
-                Style style = Application.Current.Resources["ButtonStyle"] as Style;
-                //btn.Style = style;
+                //Style style = Application.Current.Resources["Button_Command"] as Style;  
+                btn.Style = style;
                 btn.Height = 70;
-                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61,61,61));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230,230,230));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
                 PrimaryList.Children.Add(btn);
@@ -190,12 +195,9 @@ namespace Phonon
                
                 btn.PreviewKeyDown += PrimaryList_PreviewKeyDown; //honestly this is the only thing ive found that works and its terrible
 
-                btnNum++;
-                
-            }
-           
+                btnNum++;           
+            }   
             ScrollView.ScrollToTop();
-            
         }
 
         private void PrimaryList_PreviewKeyDown(object sender, KeyEventArgs e) 
@@ -412,21 +414,24 @@ namespace Phonon
             {
                 // We want to verify that this pkg has at least 1 dynamic model in it.
                 ToggleButton btn = new ToggleButton();
+                Style style = Application.Current.Resources["Button_Command"] as Style;
+
+                btn.Style = style;
+                btn.HorizontalAlignment = HorizontalAlignment.Stretch;
+                btn.VerticalAlignment = VerticalAlignment.Center;
                 btn.Focusable = true;
                 btn.Focus();
                 btn.Content = new TextBlock
                 {
                     Text = PkgName,
                     TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13
                 }; ;
-                //Style style = Application.Current.Resources["ButtonStyle"] as Style;
-                //btn.Style = style;
-                //btn.Padding = new Thickness(10, 10, 0, 10);
-                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
                 //btn.MouseEnter += ButtonEnter; // this doesnt work for some reason
                 //btn.MouseLeave += ButtonLeave;
-                btn.Height = 40;
+                btn.Height = 50;
                 btn.Click += PkgButton_Click;
                 PrimaryList.Children.Add(btn);
             }

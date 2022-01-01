@@ -33,20 +33,33 @@
                 <MenuItem Header="Export Textures" IsCheckable="True" IsChecked="True" Checked="ExportTextures_Checked" Unchecked="ExportTextures_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
                 <MenuItem Header="Export current model" Click="Export_Clicked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
-            <MenuItem Header="Version"> <!-- cant customize radio buttons? -->
-                <RadioButton x:Name="Destiny1" Margin="5" Checked="HandleVersionCheck" Content="D1"  />
-                <RadioButton x:Name="Destiny2BL" Margin="5" Checked="HandleVersionCheck" Content="D2 BL" />
-                <RadioButton x:Name="Destiny2PreBL" Margin="5" Checked="HandleVersionCheck" Content="D2 Pre-BL" />
+            <MenuItem Header="Version" Background="#3d3d3d" Foreground="#FFE6E6E6">
+                <!-- cant customize radio buttons? -->
+                <RadioButton x:Name="Destiny1" Margin="5" Checked="HandleVersionCheck" Content="Destiny 1"  />
+                <RadioButton x:Name="Destiny2BL" Margin="5" Checked="HandleVersionCheck" Content="D2 Beyond Light"/>
+                <RadioButton x:Name="Destiny2PreBL" Margin="5" Checked="HandleVersionCheck" Content="D2 Pre-Beyond Light"/>
             </MenuItem>
         </Menu>
 
-        <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="3" HorizontalAlignment="Center" Width="320" Grid.ColumnSpan="2" Focusable="False" >
+        <Menu x:Name="modesmenu" Grid.ColumnSpan="2" Grid.Column="0" Background="#3d3d3d" Foreground="#FFE6E6E6" BorderBrush="#3d3d3d" >
+            <MenuItem Header="PKGs" IsCheckable="True" IsChecked="False" BorderThickness="1" BorderBrush="#FFE6E6E6" Background="#3d3d3d" Foreground="#FFE6E6E6" Height="21" Width="90"/>
+            <MenuItem Header="API" IsCheckable="True" IsChecked="False" BorderThickness="1" BorderBrush="#FFE6E6E6"  Background="#3d3d3d" Foreground="#FFE6E6E6" Height="21" Width="90"/>
+            <MenuItem Header="Maps" IsCheckable="True" IsChecked="False" BorderThickness="1" BorderBrush="#FFE6E6E6"  Background="#3d3d3d" Foreground="#FFE6E6E6" Height="21" Width="90"/>
+        </Menu>
+
+        <Menu x:Name="searchbar" Grid.ColumnSpan="1" Grid.Column="2" Background="#3d3d3d" Foreground="#FFE6E6E6" BorderBrush="#3d3d3d" Margin="160,0,0,0" >
+        
+            
+        </Menu>
+        
+        <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="2" HorizontalAlignment="Center" Width="320" Grid.ColumnSpan="2" Focusable="False" Grid.Row="1" >
             <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Focusable="false">
                 <ToggleButton x:Name="SelectPkgsDirectoryButton" Style="{StaticResource ButtonStyle}" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click" Margin="0,512,0,0" Height="30" Width="150"/>
-            </StackPanel>
+           
             
+            </StackPanel>
         </ScrollViewer>
-        
+
         <HelixToolkit:HelixViewport3D ShowFrameRate="True" ZoomExtentsWhenLoaded="True" ZoomAroundMouseDownPoint="False" CameraRotationMode="Turntable"  RotateAroundMouseDownPoint="False" IsTopBottomViewOrientedToFrontBack="True" IsViewCubeEdgeClicksEnabled="True" Grid.Row="1" Grid.Column="2" Grid.RowSpan="2">
             <HelixToolkit:SunLight/>
             <ModelVisual3D x:Name="Yoo" Content="{Binding Model, UpdateSourceTrigger=PropertyChanged}" />
