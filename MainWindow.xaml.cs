@@ -136,6 +136,7 @@ namespace Phonon
             ShowDynamicList(pkg);
         }
 
+
         private void ShowDynamicList(Package pkg)
         {
             if (pkg.Dynamics.Count == 0)
@@ -148,22 +149,31 @@ namespace Phonon
 
             // Go back
             ToggleButton btn = new ToggleButton();
+
+            btn.Focusable = false;
             btn.Content = "Go back to package list";
             btn.Padding = new Thickness(10, 5, 0, 5);
             btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
             btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
             btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
+            
+
             PrimaryList.Children.Add(btn);
 
             foreach (Dynamic dynamic in pkg.Dynamics)
             {
+                int btnNum = 0;
                 btn = new ToggleButton();
+                btn.Focusable = true;
+                
+               
                 btn.Content = new TextBlock
                 {
                     Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
                 };
+                
                 Style style = Application.Current.Resources["ButtonStyle"] as Style;
                 //btn.Style = style;
                 btn.Height = 70;
@@ -172,8 +182,45 @@ namespace Phonon
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
                 PrimaryList.Children.Add(btn);
+
+                if (btnNum == 0) //sets focus on first in the list but its not actually the first but setting to 1 breaks it
+                {
+                    btn.Focus();
+                }
+               
+                btn.PreviewKeyDown += PrimaryList_PreviewKeyDown; //honestly this is the only thing ive found that works and its terrible
+
+                btnNum++;
+                
             }
+           
             ScrollView.ScrollToTop();
+            
+        }
+
+        private void PrimaryList_PreviewKeyDown(object sender, KeyEventArgs e) 
+        {
+            
+            if (e.Key == Key.Down)
+            {
+                this.PredictFocus(FocusNavigationDirection.Down);
+                this.MoveFocus(FocusNavigationDirection.Down);
+                this.Dynamic_Click(sender, e);
+            }
+            if (e.Key == Key.Up)
+            {
+              
+                this.PredictFocus(FocusNavigationDirection.Up);
+                this.MoveFocus(FocusNavigationDirection.Up);
+                this.Dynamic_Click(sender, e);
+            }
+
+        }
+
+        private void MoveFocus(FocusNavigationDirection direction)
+        {
+            var request = new TraversalRequest(direction);
+            this.MoveFocus(request);
         }
 
         private void Dynamic_Click(object sender, RoutedEventArgs e)
@@ -185,6 +232,7 @@ namespace Phonon
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
             System.Diagnostics.Debug.WriteLine($"Clicked {ClickedDynamicHash}");
+            
             File.AppendAllText("debug_phonon.log", $"Clicked { ClickedDynamicHash}" + Environment.NewLine);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
             ExportSettings.Hash = ClickedDynamicHash;
@@ -226,6 +274,7 @@ namespace Phonon
             IDictionary<int, Package> PackagePaths = new Dictionary<int, Package>();
             string[] files = Directory.GetFiles(GetPackagesPath(), "*.pkg", SearchOption.TopDirectoryOnly);
             // First get the dictionary of name : highest patch pkg
+            
             foreach (string file in files)
             {
                 Package pkg = new Package(file, ePhononType);
@@ -355,12 +404,16 @@ namespace Phonon
         private void ShowPackageList()
         {
             PrimaryList.Children.Clear();
+            
             List<string> PackageNames = Packages.Keys.ToList<string>();
             PackageNames.Sort();
+
             foreach (string PkgName in PackageNames)
             {
                 // We want to verify that this pkg has at least 1 dynamic model in it.
                 ToggleButton btn = new ToggleButton();
+                btn.Focusable = true;
+                btn.Focus();
                 btn.Content = new TextBlock
                 {
                     Text = PkgName,
@@ -460,6 +513,60 @@ namespace Phonon
             config.AppSettings.Settings.Add("ExportPath", Path);
             config.Save(ConfigurationSaveMode.Minimal);
             return true;
+        }
+
+        private void HandleVersionCheck(object sender, RoutedEventArgs e) //Changes Version based on selected radio button
+        {
+            RadioButton rb = sender as RadioButton;
+            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+           
+            switch (rb.Name)
+            {
+                case "Destiny1":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny1.ToString();
+                    ePhononType = PhononType.Destiny1;
+                    Wind.Title = "Phonon D1";
+                    PkgPathKey = "PackagesPathD1";
+                    PkgCacheName = "packagesD1.dat";
+                    break;
+
+                case "Destiny2BL":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
+                    ePhononType = PhononType.Destiny2BL;
+                    Wind.Title = "Phonon BL";
+                    PkgPathKey = "PackagesPathBL";
+                    PkgCacheName = "packagesBL.dat";
+                    break;
+
+                case "Destiny2PreBL":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2PREBL.ToString();
+                    ePhononType = PhononType.Destiny2PREBL;
+                    Wind.Title = "Phonon PRE-BL";
+                    PkgPathKey = "PackagesPathPREBL";
+                    PkgCacheName = "packagesPREBL.dat";
+                    break;
+
+                default:
+                    
+                    break;
+            }
+            
+            config.Save(ConfigurationSaveMode.Minimal);
+
+            Packages.Clear();
+
+            if (config.AppSettings.Settings[PkgPathKey] != null)
+            {
+                LoadPackageList();
+                ShowPackageList();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
+                SelectPkgsDirectoryButton_Click(sender, e);
+            }
+            
+
         }
 
         private void Export_Clicked(object sender, RoutedEventArgs e)
