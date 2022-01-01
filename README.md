@@ -42,9 +42,12 @@ Guide from nblock:
 
  The recommended app and depot is app=1085661, depot=589374386951979820. This equates to the game version 2.9.2.2.
 
-## Destiny 1
+## Selecting versions
+  Clicking the "Version" tab will allow you to switch between Destiny 1, Destiny 2 Beyond light and Pre-Beyond Light
+  If no path(s) are set in the config file, you will be asked to select the package path for the version you selected.
+  First time version changing will cause Phonon to freeze while it generates a content manifest. 
 
-To use the Destiny 1 version, open the config file and change the key "Value" from "Destiny2BL"/"Destiny2PREBL" to "Destiny1". To access the packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
+ 
 
 Thanks to Philip for help with textures swizzling for PS4.
 
