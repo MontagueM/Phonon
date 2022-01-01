@@ -520,33 +520,35 @@ namespace Phonon
             RadioButton rb = sender as RadioButton;
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
            
-            //Probably could've used a switch here instead
-            if (rb.Name == "Destiny1")
+            switch (rb.Name)
             {
-                config.AppSettings.Settings["Version"].Value = PhononType.Destiny1.ToString();
-                ePhononType = PhononType.Destiny1;
-                Wind.Title = "Phonon D1";
-                PkgPathKey = "PackagesPathD1";
-                PkgCacheName = "packagesD1.dat";
-               
-            }
-            if (rb.Name == "Destiny2BL")
-            {
-                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
-                ePhononType = PhononType.Destiny2BL;
-                Wind.Title = "Phonon BL";
-                PkgPathKey = "PackagesPathBL";
-                PkgCacheName = "packagesBL.dat";
-               
-            }
-            if (rb.Name == "Destiny2PreBL")
-            {
-                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2PREBL.ToString();
-                ePhononType = PhononType.Destiny2PREBL;
-                Wind.Title = "Phonon PRE-BL";
-                PkgPathKey = "PackagesPathPREBL";
-                PkgCacheName = "packagesPREBL.dat";
-                
+                case "Destiny1":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny1.ToString();
+                    ePhononType = PhononType.Destiny1;
+                    Wind.Title = "Phonon D1";
+                    PkgPathKey = "PackagesPathD1";
+                    PkgCacheName = "packagesD1.dat";
+                    break;
+
+                case "Destiny2BL":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
+                    ePhononType = PhononType.Destiny2BL;
+                    Wind.Title = "Phonon BL";
+                    PkgPathKey = "PackagesPathBL";
+                    PkgCacheName = "packagesBL.dat";
+                    break;
+
+                case "Destiny2PreBL":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2PREBL.ToString();
+                    ePhononType = PhononType.Destiny2PREBL;
+                    Wind.Title = "Phonon PRE-BL";
+                    PkgPathKey = "PackagesPathPREBL";
+                    PkgCacheName = "packagesPREBL.dat";
+                    break;
+
+                default:
+                    
+                    break;
             }
             
             config.Save(ConfigurationSaveMode.Minimal);
