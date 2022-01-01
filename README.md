@@ -24,10 +24,16 @@ You won't get banned but if they try to read the same package Phonon will not li
 * Phonon will freeze for a bit after that to generate content manifest which is a one-time-per-update thing.
 * After some time it should populate the left bar with a list of packages which can be selected to show their dynamics.
 * Exporting can be done by using the Export button on the menu bar.
+* Using the Up and Down arrow keys will move to the next/previous dynamic in the list. #Kind of buggy, going to previous will require 2 presses only for that current item
 
-## How do I use it for before Beyond Light?
+## Selecting versions
+  Clicking the "Version" tab will allow you to switch between Destiny 1, Destiny 2 Beyond light and Pre-Beyond Light
+  If no path(s) are set in the config file, you will be asked to select the package path for the version you selected.
+  First time version changing will cause Phonon to freeze while it generates a content manifest. 
 
-Find a file called Phonon.exe.config or similar depending on the name of the executable. If the file does not exist make sure to run the program at least once before so it opens. You can then close it and open the config file, changing the key "Value" from "Destiny2BL" to "Destiny2PREBL".
+  To access the D1 packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
+
+  Thanks to Philip for help with PS4 textures swizzling for Destiny 1.
 
 ## How do I get the old packages?
 
@@ -41,12 +47,6 @@ Guide from nblock:
   dotnet DepotDownloader.dll -app <#> -depot <#> -manifest <id> -username <user>
 
  The recommended app and depot is app=1085661, depot=589374386951979820. This equates to the game version 2.9.2.2.
-
-## Destiny 1
-
-To use the Destiny 1 version, open the config file and change the key "Value" from "Destiny2BL"/"Destiny2PREBL" to "Destiny1". To access the packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
-
-Thanks to Philip for help with textures swizzling for PS4.
 
 ## Errors
 
