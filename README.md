@@ -47,9 +47,9 @@ Guide from nblock:
   If no path(s) are set in the config file, you will be asked to select the package path for the version you selected.
   First time version changing will cause Phonon to freeze while it generates a content manifest. 
 
- 
+  To access the packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
 
-Thanks to Philip for help with textures swizzling for PS4.
+  Thanks to Philip for help with textures swizzling for PS4.
 
 ## Errors
 
