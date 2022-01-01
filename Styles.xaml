@@ -46,6 +46,14 @@
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
+                        <Trigger Property="IsFocused" Value="True" >
+
+                            <Setter TargetName="ButtonBackground" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="#FF0080FF"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

@@ -162,12 +162,13 @@ namespace Phonon
             btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
             btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
+            
 
             PrimaryList.Children.Add(btn);
-
+            int btnNum = 0;
             foreach (Dynamic dynamic in pkg.Dynamics)
             {
-                int btnNum = 0;
+                
                 btn = new ToggleButton();
                 btn.Focusable = true;
                
@@ -186,35 +187,38 @@ namespace Phonon
                 btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230,230,230));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
-                PrimaryList.Children.Add(btn);
+                btn.KeyDown += PrimaryList_KeyDown;
+                btn.PreviewGotKeyboardFocus += Dynamic_Click;
 
-                if (btnNum == 0) //sets focus on first in the list but its not actually the first but setting to 1 breaks it
+                if (btnNum == 0)
                 {
                     btn.Focus();
                 }
-               
-                btn.PreviewKeyDown += PrimaryList_PreviewKeyDown; //honestly this is the only thing ive found that works and its terrible
+                if(btn.IsFocused == false)
+                {
+                    btn.IsChecked = false;
+                }
 
+                PrimaryList.Children.Add(btn);
                 btnNum++;           
-            }   
+            }
             ScrollView.ScrollToTop();
         }
 
-        private void PrimaryList_PreviewKeyDown(object sender, KeyEventArgs e) 
+        private void PrimaryList_KeyDown(object sender, KeyEventArgs e) 
         {
             
             if (e.Key == Key.Down)
-            {
+            {      
+                //this.Dynamic_Click(sender, e);
                 this.PredictFocus(FocusNavigationDirection.Down);
                 this.MoveFocus(FocusNavigationDirection.Down);
-                this.Dynamic_Click(sender, e);
             }
             if (e.Key == Key.Up)
             {
-              
+                //this.Dynamic_Click(sender, e);
                 this.PredictFocus(FocusNavigationDirection.Up);
                 this.MoveFocus(FocusNavigationDirection.Up);
-                this.Dynamic_Click(sender, e);
             }
 
         }
@@ -227,10 +231,6 @@ namespace Phonon
 
         private void Dynamic_Click(object sender, RoutedEventArgs e)
         {
-            foreach (ToggleButton button in PrimaryList.Children)
-            {
-                button.IsChecked = false;
-            }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
             System.Diagnostics.Debug.WriteLine($"Clicked {ClickedDynamicHash}");
@@ -420,7 +420,7 @@ namespace Phonon
                 btn.HorizontalAlignment = HorizontalAlignment.Stretch;
                 btn.VerticalAlignment = VerticalAlignment.Center;
                 btn.Focusable = true;
-                btn.Focus();
+                //btn.Focus();
                 btn.Content = new TextBlock
                 {
                     Text = PkgName,
