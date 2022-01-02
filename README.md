@@ -6,8 +6,8 @@ A GUI with similar functionality of the console application [MDE](https://github
 
 Current capability:
 
-* Works with packages for Beyond Light and before Beyond Light
-* Scrolling through all dynamic models in the entire of Destiny 2
+* Works with packages for Destiny 1, Destiny 2 Beyond Light and before Beyond Light
+* Scrolling through all dynamic models in the entire of Destiny 1 and 2
 * Exporting with option for name, folder, and texture extraction
 
 Download and have a look, it should be much easier to use than MDE.
