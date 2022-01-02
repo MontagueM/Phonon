@@ -40,12 +40,18 @@ namespace Phonon
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
+       
+        List<Dynamic> currentdynamics = new List<Dynamic>(); //probably a better way of doing this
+        string currentpkg = "";
+
         Exporter ExportSettings = new Exporter();
-        PhononType ePhononType = PhononType.Destiny2BL;
+        PhononType ePhononType;
+
         string PkgPathKey = "";
         string PkgCacheName = "";
         public MainWindow()
         {
+            
             InitializeComponent();
             InitialiseConfig();
 
@@ -59,12 +65,14 @@ namespace Phonon
 
             if (config.AppSettings.Settings["Version"] != null)
             {
+
                 if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2BL.ToString())
                 {
                     ePhononType = PhononType.Destiny2BL;
                     Wind.Title = "Phonon BL";
                     PkgPathKey = "PackagesPathBL";
                     PkgCacheName = "packagesBL.dat";
+                    Destiny2BL.IsChecked = true;
 
                 }
                 else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2PREBL.ToString())
@@ -73,6 +81,7 @@ namespace Phonon
                     Wind.Title = "Phonon PRE-BL";
                     PkgPathKey = "PackagesPathPREBL";
                     PkgCacheName = "packagesPREBL.dat";
+                    Destiny2PreBL.IsChecked = true;
                 }
                 else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny1.ToString())
                 {
@@ -80,6 +89,7 @@ namespace Phonon
                     Wind.Title = "Phonon D1";
                     PkgPathKey = "PackagesPathD1";
                     PkgCacheName = "packagesD1.dat";
+                    Destiny1.IsChecked = true;
                 }
                 else
                 {
@@ -131,12 +141,14 @@ namespace Phonon
 
         private void PkgButton_Click(object sender, RoutedEventArgs e)
         {
+            currentdynamics.Clear();
             string ClickedPackageName = (((sender as ToggleButton).Content) as TextBlock).Text;
+            currentpkg = ClickedPackageName;
             Package pkg = Packages[ClickedPackageName];
+            currentdynamics = pkg.Dynamics;
             ShowDynamicList(pkg);
         }
-
-
+        
         private void ShowDynamicList(Package pkg)
         {
             if (pkg.Dynamics.Count == 0)
@@ -179,10 +191,8 @@ namespace Phonon
                     FontSize = 13
                 };
                 
-                //Style style = Application.Current.Resources["Button_Command"] as Style;  
                 btn.Style = style;
-                btn.Height = 70;
-                
+                btn.Height = 70;               
                 btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61,61,61));
                 btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230,230,230));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
@@ -510,7 +520,6 @@ namespace Phonon
                 }
             }
         }
-
         private bool SetExportPath(string Path)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
@@ -524,7 +533,7 @@ namespace Phonon
         {
             RadioButton rb = sender as RadioButton;
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-           
+ 
             switch (rb.Name)
             {
                 case "Destiny1":
@@ -570,8 +579,6 @@ namespace Phonon
                 System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
                 SelectPkgsDirectoryButton_Click(sender, e);
             }
-            
-
         }
 
         private void Export_Clicked(object sender, RoutedEventArgs e)
@@ -597,6 +604,36 @@ namespace Phonon
             {
                 System.Windows.MessageBox.Show("Export failed");
             }
+        }
+
+        private void ExportAll_Clicked(object sender, RoutedEventArgs e)
+        {
+
+            if (currentdynamics.Count == 0)
+            {
+                System.Windows.MessageBox.Show("No PKG selected");
+                return;
+            }
+
+            string outputpath;
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                outputpath = dialog.SelectedPath;
+            }
+            if (outputpath == "")
+            {
+                System.Windows.MessageBox.Show("No output path selected");
+                return;
+            }
+
+            foreach (Dynamic dynamic in currentdynamics)
+            {
+                ExportSettings.Hash = dynamic.HashString;
+                ExportSettings.Path = $"{outputpath}\\{currentpkg}\\{dynamic.Hash.ToString()}.fbx";
+                bool status = ExportSettings.Export(GetPackagesPath(), ePhononType); 
+            }        
+            System.Windows.MessageBox.Show("Export success");
         }
     }
 

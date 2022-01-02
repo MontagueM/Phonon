@@ -59,7 +59,10 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="#3d3d3d"/>
+        <Setter Property="BorderBrush" Value="White"/>
+    </Style>
     
 
 </ResourceDictionary>

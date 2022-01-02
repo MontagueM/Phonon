@@ -6,7 +6,7 @@
         xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:local="clr-namespace:Phonon"
         mc:Ignorable="d"
-        Title="Phonon" Height="1080" Width="1920" Name="Wind">
+        Title="Phonon" Height="1080" Width="1920" WindowState="Maximized" Name="Wind">
     <Window.Resources>
         <local:MainViewModel x:Key="MVM"/>
     </Window.Resources>
@@ -32,12 +32,13 @@
                 <!-- <MenuItem Header="Set export path" Click="SetExportPath_Clicked" Background="#3d3d3d" Foreground="White"/> -->
                 <MenuItem Header="Export Textures" IsCheckable="True" IsChecked="True" Checked="ExportTextures_Checked" Unchecked="ExportTextures_Unchecked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
                 <MenuItem Header="Export current model" Click="Export_Clicked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
+                <MenuItem Header="Export All" Click="ExportAll_Clicked" Background="#3d3d3d" Foreground="#FFE6E6E6"/>
             </MenuItem>
             <MenuItem Header="Version" Background="#3d3d3d" Foreground="#FFE6E6E6">
                 <!-- cant customize radio buttons? -->
-                <RadioButton x:Name="Destiny1" Margin="5" Checked="HandleVersionCheck" Content="Destiny 1"  />
-                <RadioButton x:Name="Destiny2BL" Margin="5" Checked="HandleVersionCheck" Content="D2 Beyond Light"/>
-                <RadioButton x:Name="Destiny2PreBL" Margin="5" Checked="HandleVersionCheck" Content="D2 Pre-Beyond Light"/>
+                <RadioButton GroupName="Mode" x:Name="Destiny1" Margin="5" Checked="HandleVersionCheck" Content="Destiny 1"  />
+                <RadioButton GroupName="Mode" x:Name="Destiny2BL" Margin="5" Checked="HandleVersionCheck" Content="D2 Beyond Light"/>
+                <RadioButton GroupName="Mode" x:Name="Destiny2PreBL" Margin="5" Checked="HandleVersionCheck" Content="D2 Pre-Beyond Light"/>
             </MenuItem>
         </Menu>
 
@@ -53,6 +54,7 @@
         </Menu>
         
         <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.RowSpan="2" HorizontalAlignment="Center" Width="320" Grid.ColumnSpan="2" Focusable="False" Grid.Row="1" >
+            
             <StackPanel x:Name="PrimaryList" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Focusable="false">
                 <ToggleButton x:Name="SelectPkgsDirectoryButton" Style="{StaticResource ButtonStyle}" Content="Select Packages Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SelectPkgsDirectoryButton_Click" Margin="0,512,0,0" Height="30" Width="150"/>
            
