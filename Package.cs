@@ -90,7 +90,7 @@ namespace Phonon
 
         public bool GetHandle()
         {
-            Handle = new BinaryReader(File.Open(Path, FileMode.Open));
+            Handle = new BinaryReader(File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read));
             return true;
         }
 

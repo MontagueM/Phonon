@@ -88,6 +88,11 @@ namespace Phonon
         public string GetPackagesPath()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+            if (config.AppSettings.Settings["PackagesPathD1"] == null)
+            {
+                System.Windows.MessageBox.Show($"No package path found for Destiny 1.");
+                return "";
+            }
             return config.AppSettings.Settings["PackagesPathD1"].Value.ToString();
         }
         private void ExtractSelectedMapsButton_Click(object sender, RoutedEventArgs e)
@@ -117,7 +122,12 @@ namespace Phonon
                 }
                 ExportSettings.Path = dialog.SelectedPath;
             }
-            bool status = ExportSettings.ExportD1Map(GetPackagesPath(), MapNames, MapInfoDict[PkgName]);
+            string PkgsPath = GetPackagesPath();
+            if (PkgsPath == "")
+            {
+                return;
+            }
+            bool status = ExportSettings.ExportD1Map(PkgsPath, MapNames, MapInfoDict[PkgName]);
             if (status)
             {
                 System.Windows.MessageBox.Show("Export success");

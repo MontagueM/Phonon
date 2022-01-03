@@ -439,6 +439,11 @@ namespace Phonon
 
         private bool SetPackagePath(string Path)
         {
+            if (Path == "")
+            {
+                System.Windows.MessageBox.Show("Directory selected is invalid, please select the correct packages directory.");
+                return false;
+            }
             // Verify this is a valid path by checking to see if a .pkg file is inside
             string[] files = Directory.GetFiles(Path, "*.pkg", SearchOption.TopDirectoryOnly);
             if (files.Length == 0)
@@ -513,6 +518,8 @@ namespace Phonon
         {
             RadioButton rb = sender as RadioButton;
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+
+            if (config.AppSettings.Settings["Version"] == null) return;
 
             switch (rb.Name)
             {

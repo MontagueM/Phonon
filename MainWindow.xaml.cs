@@ -39,6 +39,5 @@ namespace Phonon
 
     public partial class MainWindow : Window
     {
-
     }
 }
