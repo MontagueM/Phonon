@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,9 +10,10 @@ namespace Phonon
 {
     class Exporter
     {
-        public bool bTextures = true;
+        public bool bTextures = false;
         public string Path = "";
         public string Hash = "";
+
         public Exporter()
         {
 
@@ -32,16 +34,40 @@ namespace Phonon
             bool status = false;
             if (ePhononType == PhononType.Destiny2BL)
             {
-                status = RequestExportDynamicBL(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+                status = RequestExportDynamicBL(Hash, PackagesPath, SavePath, SaveName, bTextures);
             }
             else if (ePhononType == PhononType.Destiny2PREBL)
             {
-                status = RequestExportDynamicPREBL(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+                status = RequestExportDynamicPREBL(Hash, PackagesPath, SavePath, SaveName, bTextures);
             }
             else if (ePhononType == PhononType.Destiny1)
             {
-                status = RequestExportDynamicD1(Hash, PackagesPath, SavePath, SaveName, bTextures); ;
+                status = RequestExportDynamicD1(Hash, PackagesPath, SavePath, SaveName, bTextures);
             }
+
+            return status;
+        }
+
+        public bool ExportD1Map(string PackagesPath, List<string> MapNames, Dictionary<string, Dictionary<string, List<string>>> MapInfoDict)
+        {
+            [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestExportD1Map")]
+            static extern bool RequestExportD1Map([MarshalAs(UnmanagedType.LPStr)] string MapHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+
+            bool status = true;
+            string[] s = Path.Split("\\");
+            //Parallel.ForEach(MapNames, MapName =>
+            foreach (string MapName in MapNames)
+            {
+                string SavePath = String.Join("/", s) + "/" + MapName + "/";
+                Directory.CreateDirectory(SavePath);
+                List<string> StaticHashes = MapInfoDict[MapName]["static"];
+                //Parallel.ForEach(StaticHashes, MapHash =>
+                foreach (string MapHash in StaticHashes)
+                {
+                    status &= RequestExportD1Map(MapHash, PackagesPath, SavePath, MapName, bTextures);
+                }//);
+
+            }//);
 
             return status;
         }

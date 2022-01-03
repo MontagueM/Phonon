@@ -11,5 +11,6 @@
   <ItemGroup>
     <PackageReference Include="HelixToolkit" Version="2.20.0" />
     <PackageReference Include="HelixToolkit.Wpf" Version="2.20.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 </Project>
