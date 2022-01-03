@@ -20,5 +20,51 @@
                 <Setter Property="Background" Value="Red"/>
             </Trigger>
         </Style.Triggers>
+        
     </Style>
+
+    <Style TargetType="ToggleButton" x:Key="Button_Command">
+        <Setter Property="Foreground" Value="#a0a0a0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border x:Name="ButtonBackground" BorderBrush="White">
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,0,0"/>
+                        <Border.BorderThickness>1</Border.BorderThickness>
+                        <Border.CornerRadius>2</Border.CornerRadius>
+                        <Border.Background>
+                            <SolidColorBrush Color="#3d3d3d"/>
+                        </Border.Background>
+                        
+                    </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBackground" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="#FF0080FF"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True" >
+
+                            <Setter TargetName="ButtonBackground" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="#FF0080FF"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="#3d3d3d"/>
+        <Setter Property="BorderBrush" Value="White"/>
+    </Style>
+    
+
 </ResourceDictionary>
+    
+    

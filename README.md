@@ -6,8 +6,8 @@ A GUI with similar functionality of the console application [MDE](https://github
 
 Current capability:
 
-* Works with packages for Beyond Light and before Beyond Light
-* Scrolling through all dynamic models in the entire of Destiny 2
+* Works with packages for Destiny 1, Destiny 2 Beyond Light and before Beyond Light
+* Scrolling through all dynamic models in the entire of Destiny 1 and 2
 * Exporting with option for name, folder, and texture extraction
 
 Download and have a look, it should be much easier to use than MDE.
@@ -24,7 +24,7 @@ You won't get banned but if they try to read the same package Phonon will not li
 * Phonon will freeze for a bit after that to generate content manifest which is a one-time-per-update thing.
 * After some time it should populate the left bar with a list of packages which can be selected to show their dynamics.
 * Exporting can be done by using the Export button on the menu bar.
-* Using the Up and Down arrow keys will move to the next/previous dynamic in the list. #Kind of buggy, going to previous will require 2 presses only for that current item
+* Using the Up and Down arrow keys will move to the next/previous dynamic in the list.
 
 ## Selecting versions
   Clicking the "Version" tab will allow you to switch between Destiny 1, Destiny 2 Beyond light and Pre-Beyond Light

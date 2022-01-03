@@ -40,12 +40,18 @@ namespace Phonon
     public partial class MainWindow : Window
     {
         ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
+       
+        List<Dynamic> currentdynamics = new List<Dynamic>(); //probably a better way of doing this
+        string currentpkg = "";
+
         Exporter ExportSettings = new Exporter();
-        PhononType ePhononType = PhononType.Destiny2BL;
+        PhononType ePhononType;
+
         string PkgPathKey = "";
         string PkgCacheName = "";
         public MainWindow()
         {
+            
             InitializeComponent();
             InitialiseConfig();
 
@@ -59,12 +65,14 @@ namespace Phonon
 
             if (config.AppSettings.Settings["Version"] != null)
             {
+
                 if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2BL.ToString())
                 {
                     ePhononType = PhononType.Destiny2BL;
                     Wind.Title = "Phonon BL";
                     PkgPathKey = "PackagesPathBL";
                     PkgCacheName = "packagesBL.dat";
+                    Destiny2BL.IsChecked = true;
 
                 }
                 else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2PREBL.ToString())
@@ -73,6 +81,7 @@ namespace Phonon
                     Wind.Title = "Phonon PRE-BL";
                     PkgPathKey = "PackagesPathPREBL";
                     PkgCacheName = "packagesPREBL.dat";
+                    Destiny2PreBL.IsChecked = true;
                 }
                 else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny1.ToString())
                 {
@@ -80,6 +89,7 @@ namespace Phonon
                     Wind.Title = "Phonon D1";
                     PkgPathKey = "PackagesPathD1";
                     PkgCacheName = "packagesD1.dat";
+                    Destiny1.IsChecked = true;
                 }
                 else
                 {
@@ -131,12 +141,14 @@ namespace Phonon
 
         private void PkgButton_Click(object sender, RoutedEventArgs e)
         {
+            currentdynamics.Clear();
             string ClickedPackageName = (((sender as ToggleButton).Content) as TextBlock).Text;
+            currentpkg = ClickedPackageName;
             Package pkg = Packages[ClickedPackageName];
+            currentdynamics = pkg.Dynamics;
             ShowDynamicList(pkg);
         }
-
-
+        
         private void ShowDynamicList(Package pkg)
         {
             if (pkg.Dynamics.Count == 0)
@@ -149,70 +161,74 @@ namespace Phonon
 
             // Go back
             ToggleButton btn = new ToggleButton();
+            Style style = Application.Current.Resources["Button_Command"] as Style;
 
+            btn.Style = style;
+            btn.HorizontalAlignment = HorizontalAlignment.Stretch;
+            btn.VerticalAlignment = VerticalAlignment.Center;
+            btn.Height = 40;
             btn.Focusable = false;
             btn.Content = "Go back to package list";
-            btn.Padding = new Thickness(10, 5, 0, 5);
-            btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-            btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+            btn.Padding = new Thickness(10,5,0,5);
+            btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+            btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
             btn.HorizontalContentAlignment = HorizontalAlignment.Left;
             btn.Click += GoBack_Click;
             
 
             PrimaryList.Children.Add(btn);
-
+            int btnNum = 0;
             foreach (Dynamic dynamic in pkg.Dynamics)
             {
-                int btnNum = 0;
+                
                 btn = new ToggleButton();
                 btn.Focusable = true;
-                
                
                 btn.Content = new TextBlock
                 {
                     Text = dynamic.GetHashString() + "\nHas Skeleton: " + dynamic.bHasSkeleton.ToString() + "\nMesh Count: " + dynamic.MeshCount.ToString(),
                     TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13
                 };
                 
-                Style style = Application.Current.Resources["ButtonStyle"] as Style;
-                //btn.Style = style;
-                btn.Height = 70;
-                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                btn.Style = style;
+                btn.Height = 70;               
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61,61,61));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230,230,230));
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
-                PrimaryList.Children.Add(btn);
+                btn.KeyDown += PrimaryList_KeyDown;
+                btn.PreviewGotKeyboardFocus += Dynamic_Click;
 
-                if (btnNum == 0) //sets focus on first in the list but its not actually the first but setting to 1 breaks it
+                if (btnNum == 0)
                 {
                     btn.Focus();
                 }
-               
-                btn.PreviewKeyDown += PrimaryList_PreviewKeyDown; //honestly this is the only thing ive found that works and its terrible
+                if(btn.IsFocused == false)
+                {
+                    btn.IsChecked = false;
+                }
 
-                btnNum++;
-                
+                PrimaryList.Children.Add(btn);
+                btnNum++;           
             }
-           
             ScrollView.ScrollToTop();
-            
         }
 
-        private void PrimaryList_PreviewKeyDown(object sender, KeyEventArgs e) 
+        private void PrimaryList_KeyDown(object sender, KeyEventArgs e) 
         {
             
             if (e.Key == Key.Down)
-            {
+            {      
+                //this.Dynamic_Click(sender, e);
                 this.PredictFocus(FocusNavigationDirection.Down);
                 this.MoveFocus(FocusNavigationDirection.Down);
-                this.Dynamic_Click(sender, e);
             }
             if (e.Key == Key.Up)
             {
-              
+                //this.Dynamic_Click(sender, e);
                 this.PredictFocus(FocusNavigationDirection.Up);
                 this.MoveFocus(FocusNavigationDirection.Up);
-                this.Dynamic_Click(sender, e);
             }
 
         }
@@ -225,10 +241,6 @@ namespace Phonon
 
         private void Dynamic_Click(object sender, RoutedEventArgs e)
         {
-            foreach (ToggleButton button in PrimaryList.Children)
-            {
-                button.IsChecked = false;
-            }
             (sender as ToggleButton).IsChecked = true;
             string ClickedDynamicHash = (((sender as ToggleButton).Content) as TextBlock).Text.Split("\n")[0];
             System.Diagnostics.Debug.WriteLine($"Clicked {ClickedDynamicHash}");
@@ -412,21 +424,24 @@ namespace Phonon
             {
                 // We want to verify that this pkg has at least 1 dynamic model in it.
                 ToggleButton btn = new ToggleButton();
+                Style style = Application.Current.Resources["Button_Command"] as Style;
+
+                btn.Style = style;
+                btn.HorizontalAlignment = HorizontalAlignment.Stretch;
+                btn.VerticalAlignment = VerticalAlignment.Center;
                 btn.Focusable = true;
-                btn.Focus();
+                //btn.Focus();
                 btn.Content = new TextBlock
                 {
                     Text = PkgName,
                     TextWrapping = TextWrapping.Wrap,
+                    FontSize = 13
                 }; ;
-                //Style style = Application.Current.Resources["ButtonStyle"] as Style;
-                //btn.Style = style;
-                //btn.Padding = new Thickness(10, 10, 0, 10);
-                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
-                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                btn.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(61, 61, 61));
+                btn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(230, 230, 230));
                 //btn.MouseEnter += ButtonEnter; // this doesnt work for some reason
                 //btn.MouseLeave += ButtonLeave;
-                btn.Height = 40;
+                btn.Height = 50;
                 btn.Click += PkgButton_Click;
                 PrimaryList.Children.Add(btn);
             }
@@ -505,7 +520,6 @@ namespace Phonon
                 }
             }
         }
-
         private bool SetExportPath(string Path)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
@@ -519,7 +533,7 @@ namespace Phonon
         {
             RadioButton rb = sender as RadioButton;
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-           
+ 
             switch (rb.Name)
             {
                 case "Destiny1":
@@ -565,8 +579,6 @@ namespace Phonon
                 System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
                 SelectPkgsDirectoryButton_Click(sender, e);
             }
-            
-
         }
 
         private void Export_Clicked(object sender, RoutedEventArgs e)
@@ -592,6 +604,36 @@ namespace Phonon
             {
                 System.Windows.MessageBox.Show("Export failed");
             }
+        }
+
+        private void ExportAll_Clicked(object sender, RoutedEventArgs e)
+        {
+
+            if (currentdynamics.Count == 0)
+            {
+                System.Windows.MessageBox.Show("No PKG selected");
+                return;
+            }
+
+            string outputpath;
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                outputpath = dialog.SelectedPath;
+            }
+            if (outputpath == "")
+            {
+                System.Windows.MessageBox.Show("No output path selected");
+                return;
+            }
+
+            foreach (Dynamic dynamic in currentdynamics)
+            {
+                ExportSettings.Hash = dynamic.HashString;
+                ExportSettings.Path = $"{outputpath}\\{currentpkg}\\{dynamic.Hash.ToString()}.fbx";
+                bool status = ExportSettings.Export(GetPackagesPath(), ePhononType); 
+            }        
+            System.Windows.MessageBox.Show("Export success");
         }
     }
 
