@@ -25,8 +25,8 @@ namespace Phonon
         }
     }
 
-    
-    struct PkgHeader
+
+    public struct PkgHeader
     {
         public ushort PkgID;
         public ushort PatchID;
@@ -35,7 +35,7 @@ namespace Phonon
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct PkgEntry
+    public struct PkgEntry
     {
         public uint Reference;
         public uint EntryB;
@@ -43,7 +43,7 @@ namespace Phonon
         public uint EntryD;
     }
 
-    class Package
+    public class Package
     {
         public string Path;
         public string Name;  // The name excludes the patch ID

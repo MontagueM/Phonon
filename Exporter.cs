@@ -8,41 +8,55 @@ using System.Threading.Tasks;
 
 namespace Phonon
 {
-    class Exporter
+    public class Exporter
     {
-        public bool bTextures = false;
         public string Path = "";
         public string Hash = "";
+        public string SaveName = "";
+        public PhononType ePhononType;
+        public TextureFormat eTextureFormat;
 
         public Exporter()
         {
 
         }
-        public bool Export(string PackagesPath, PhononType ePhononType)
+        public bool Export(string PackagesPath)
         {
             string[] s = Path.Split("\\");
             string SavePath = String.Join("/", s);
-            string SaveName = s.Last().Split(".")[0];
+            string FinalSaveName = "";
+            if (SaveName == "")
+            {
+                SaveName = s.Last().Split(".")[0];
+                FinalSaveName = SaveName;
+            }
+            else
+            {
+                SavePath += "/" + SaveName + "/";
+                Directory.CreateDirectory(SavePath);
+                FinalSaveName = SaveName +  "_" +  Hash;
+            }
+
 
             [DllImport("DestinyDynamicExtractorBL.dll", EntryPoint = "RequestExportDynamic")]
-            static extern bool RequestExportDynamicBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+            static extern bool RequestExportDynamicBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, int TextureFormat);
             [DllImport("DestinyDynamicExtractorPREBL.dll", EntryPoint = "RequestExportDynamic")]
-            static extern bool RequestExportDynamicPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+            static extern bool RequestExportDynamicPREBL([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, int TextureFormat);
             [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestExportDynamic")]
-            static extern bool RequestExportDynamicD1([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+            static extern bool RequestExportDynamicD1([MarshalAs(UnmanagedType.LPStr)] string DynamicHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, int TextureFormat);
 
             bool status = false;
             if (ePhononType == PhononType.Destiny2BL)
             {
-                status = RequestExportDynamicBL(Hash, PackagesPath, SavePath, SaveName, bTextures);
+                status = RequestExportDynamicBL(Hash, PackagesPath, SavePath, FinalSaveName, ((int)eTextureFormat));
             }
             else if (ePhononType == PhononType.Destiny2PREBL)
             {
-                status = RequestExportDynamicPREBL(Hash, PackagesPath, SavePath, SaveName, bTextures);
+                status = RequestExportDynamicPREBL(Hash, PackagesPath, SavePath, FinalSaveName, ((int)eTextureFormat));
             }
             else if (ePhononType == PhononType.Destiny1)
             {
-                status = RequestExportDynamicD1(Hash, PackagesPath, SavePath, SaveName, bTextures);
+                status = RequestExportDynamicD1(Hash, PackagesPath, SavePath, FinalSaveName, ((int)eTextureFormat));
             }
 
             return status;
@@ -51,7 +65,7 @@ namespace Phonon
         public bool ExportD1Map(string PackagesPath, List<string> MapNames, Dictionary<string, Dictionary<string, List<string>>> MapInfoDict)
         {
             [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestExportD1Map")]
-            static extern bool RequestExportD1Map([MarshalAs(UnmanagedType.LPStr)] string MapHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, bool bTextures);
+            static extern bool RequestExportD1Map([MarshalAs(UnmanagedType.LPStr)] string MapHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, int TextureFormat);
 
             bool status = true;
             string[] s = Path.Split("\\");
@@ -64,7 +78,7 @@ namespace Phonon
                 //Parallel.ForEach(StaticHashes, MapHash =>
                 foreach (string MapHash in StaticHashes)
                 {
-                    status &= RequestExportD1Map(MapHash, PackagesPath, SavePath, MapName, bTextures);
+                    status &= RequestExportD1Map(MapHash, PackagesPath, SavePath, MapName, ((int)eTextureFormat));
                 }//);
 
             }//);

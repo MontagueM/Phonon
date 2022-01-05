@@ -14,7 +14,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="100*" />
-            <RowDefinition Height="5*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <ScrollViewer Background="#3d3d3d" Name="ScrollView" Grid.Column="0" Grid.ColumnSpan="1" Grid.Row="0" Grid.RowSpan="2" Focusable="False" >
@@ -35,7 +35,6 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="2" Grid.ColumnSpan="1" Content="Extract selected maps" Click="ExtractSelectedMapsButton_Click"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Button>
-            <CheckBox Grid.Column="0" Foreground="LightGray" x:Name="MapTexturesCheckbox" Checked="ExportTextures_Checked" Unchecked="ExportTextures_Unchecked" Content="Extract textures" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
         </Grid>
     </Grid>
 </UserControl>

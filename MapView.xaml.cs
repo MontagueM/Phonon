@@ -138,16 +138,6 @@ namespace Phonon
             }
         }
 
-        private void ExportTextures_Checked(object sender, RoutedEventArgs e)
-        {
-            ExportSettings.bTextures = true;
-        }
-
-        private void ExportTextures_Unchecked(object sender, RoutedEventArgs e)
-        {
-            ExportSettings.bTextures = false;
-        }
-
         private void ShowPkgList()
         {
             MapsList.Children.Clear();

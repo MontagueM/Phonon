@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Phonon.APIView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Phonon"
+             mc:Ignorable="d" 
+             d:DesignHeight="1080" d:DesignWidth="1920">
+    <Grid Background="#121212" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="100*" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="textBlock" Foreground="LightGray" HorizontalAlignment="Left" Margin="10,0,0,0" Text="Name of gear:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+        <ListView x:Name="ListViewAPI" Background="#121212" Grid.Row="1">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Width="400" Foreground="LightGray" x:Name="GearName" Text="{Binding Name}"/>
+                        <TextBlock Width="000" Foreground="LightGray" x:Name="GearType" Text="{Binding Type}"/>
+                        <TextBlock Width="000" Foreground="LightGray" x:Name="GearClass" Text="{Binding Class}"/>
+                        <Button Width="100" x:Name="GearExtractBtn" Click="ExtractGearBtn_Click" Content="Extract gear"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <TextBox x:Name="textBox" TextChanged="TextBox_TextChanged" HorizontalAlignment="Left" Margin="102,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="700" FontSize="30"/>
+    </Grid>
+</UserControl>

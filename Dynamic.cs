@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Phonon
 {
 
-    class Dynamic
+    public class Dynamic
     {
         public uint Hash;
         public string HashString;

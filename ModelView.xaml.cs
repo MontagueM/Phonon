@@ -25,13 +25,8 @@ namespace Phonon
 
     public partial class ModelView : UserControl
     {
-        ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
-        List<Dynamic> CurrentDynamics = new List<Dynamic>();
-        string CurrentPkg = "";
-        Exporter ExportSettings = new Exporter();
-        PhononType ePhononType;
-        string PkgPathKey = "";
-        string PkgCacheName = "";
+        public ConcurrentDictionary<string, Package> Packages = new ConcurrentDictionary<string, Package>();
+        Package CurrentPkg;
         private MainWindow mainWindow = null; // Reference to the MainWindow
         int SelectedDynamicIndex = 0;
 
@@ -43,7 +38,7 @@ namespace Phonon
         private void OnControlLoaded(object sender, RoutedEventArgs e)
         {
             mainWindow = Window.GetWindow(this) as MainWindow;
-            if (PkgCacheName == "")
+            if (mainWindow.PkgCacheName != "")
             {
                 InitialiseConfig();
             }
@@ -51,61 +46,8 @@ namespace Phonon
 
         private void InitialiseConfig()
         {
-            // Check if we need to get the package path first
-            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            // Check what version to load (BL or pre-BL)
-
-            if (config.AppSettings.Settings["Version"] != null)
-            {
-                if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2BL.ToString())
-                {
-                    ePhononType = PhononType.Destiny2BL;
-                    mainWindow.Wind.Title = "Phonon BL";
-                    PkgPathKey = "PackagesPathBL";
-                    PkgCacheName = "packagesBL.dat";
-                    Destiny2BL.IsChecked = true;
-
-                }
-                else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2PREBL.ToString())
-                {
-                    ePhononType = PhononType.Destiny2PREBL;
-                    mainWindow.Wind.Title = "Phonon PRE-BL";
-                    PkgPathKey = "PackagesPathPREBL";
-                    PkgCacheName = "packagesPREBL.dat";
-                    Destiny2PreBL.IsChecked = true;
-                }
-                else if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny1.ToString())
-                {
-                    ePhononType = PhononType.Destiny1;
-                    mainWindow.Wind.Title = "Phonon D1";
-                    PkgPathKey = "PackagesPathD1";
-                    PkgCacheName = "packagesD1.dat";
-                    Destiny1.IsChecked = true;
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("Incorrect value set for 'Version', defaulting to Beyond Light settings");
-                    ePhononType = PhononType.Destiny2BL;
-                    mainWindow.Wind.Title = "Phonon BL";
-                    PkgPathKey = "PackagesPathBL";
-                    PkgCacheName = "packagesBL.dat";
-                    Destiny2BL.IsChecked = true;
-                }
-            }
-            else
-            {
-                System.Windows.MessageBox.Show("Defaulting to Beyond Light settings");
-                ePhononType = PhononType.Destiny2BL;
-                mainWindow.Wind.Title = "Phonon BL";
-                PkgPathKey = "PackagesPathBL";
-                PkgCacheName = "packagesBL.dat";
-                Destiny2BL.IsChecked = true;
-                config.AppSettings.Settings.Add("Version", PhononType.Destiny2BL.ToString());
-                config.Save(ConfigurationSaveMode.Minimal);
-            }
-
             // Check for package path and load the list
-            if (config.AppSettings.Settings[PkgPathKey] != null)
+            if (mainWindow.config.AppSettings.Settings[mainWindow.PkgPathKey] != null)
             {
                 SelectPkgsDirectoryButton.Visibility = Visibility.Hidden;
                 LoadPackageList();
@@ -113,14 +55,15 @@ namespace Phonon
             }
             else
             {
-                System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
+                System.Windows.MessageBox.Show($"No package path found for {mainWindow.ePhononType.ToString()}");
             }
         }
 
-        private void SelectPkgsDirectoryButton_Click(object sender, RoutedEventArgs e)
+        public void SelectPkgsDirectoryButton_Click(object sender, RoutedEventArgs e)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
+                dialog.Description = $"Select the packages folder for {mainWindow.ePhononType.ToString()}";
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
                 bool success = SetPackagePath(dialog.SelectedPath);
                 if (success)
@@ -134,11 +77,9 @@ namespace Phonon
 
         private void PkgButton_Click(object sender, RoutedEventArgs e)
         {
-            CurrentDynamics.Clear();
             string ClickedPackageName = (((sender as ToggleButton).Content) as TextBlock).Text;
             Package pkg = Packages[ClickedPackageName];
-            CurrentPkg = ClickedPackageName;
-            CurrentDynamics = pkg.Dynamics;
+            CurrentPkg = pkg;
             ShowDynamicList(pkg);
         }
 
@@ -189,12 +130,6 @@ namespace Phonon
                 btn.HorizontalContentAlignment = HorizontalAlignment.Left;
                 btn.Click += Dynamic_Click;
 
-                //if (PrimaryList.Children.Count == 1)
-                //{
-                //    btn.Focus();
-                //    Dynamic_Click(btn, new RoutedEventArgs());
-                //}
-
                 PrimaryList.Children.Add(btn);
             }
 
@@ -203,7 +138,7 @@ namespace Phonon
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Down || e.Key == Key.Right)
+            if ((e.Key == Key.Down || e.Key == Key.Right) && SelectedDynamicIndex < PrimaryList.Children.Count - 2)
             {
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = false;
                 SelectedDynamicIndex++;
@@ -211,7 +146,7 @@ namespace Phonon
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = true;
                 Dynamic_Click(PrimaryList.Children[SelectedDynamicIndex], new RoutedEventArgs());
             }
-            else if (e.Key == Key.Up || e.Key == Key.Left)
+            else if ((e.Key == Key.Up || e.Key == Key.Left) && SelectedDynamicIndex > 0)
             {
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = false;
                 SelectedDynamicIndex--;
@@ -234,9 +169,9 @@ namespace Phonon
 
             File.AppendAllText("debug_phonon.log", $"Clicked { ClickedDynamicHash}" + Environment.NewLine);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
-            ExportSettings.Hash = ClickedDynamicHash;
+            mainWindow.ExportSettings.Hash = ClickedDynamicHash;
             Dynamic dynamic = new Dynamic(h);
-            dynamic.GetDynamicMesh(GetPackagesPath(), ePhononType);
+            dynamic.GetDynamicMesh(GetPackagesPath(), mainWindow.ePhononType);
             MainViewModel MVM = (MainViewModel)UCModelView.Resources["MVM"];
             MVM.UpdateModel(dynamic.Vertices, dynamic.Faces);
         }
@@ -246,9 +181,9 @@ namespace Phonon
             ShowPackageList();
         }
 
-        private void LoadPackageList()
+        public void LoadPackageList()
         {
-            if (File.Exists(PkgCacheName))
+            if (File.Exists(mainWindow.PkgCacheName))
             {
                 bool success = ParsePackageList();
                 if (!success)
@@ -268,7 +203,7 @@ namespace Phonon
         }
         private bool ParsePackageList()
         {
-            BinaryReader Handle = new BinaryReader(File.Open(PkgCacheName, FileMode.Open));
+            BinaryReader Handle = new BinaryReader(File.Open(mainWindow.PkgCacheName, FileMode.Open));
             // PkgID : Path dict
             IDictionary<int, Package> PackagePaths = new Dictionary<int, Package>();
             string[] files = Directory.GetFiles(GetPackagesPath(), "*.pkg", SearchOption.TopDirectoryOnly);
@@ -276,7 +211,7 @@ namespace Phonon
 
             foreach (string file in files)
             {
-                Package pkg = new Package(file, ePhononType);
+                Package pkg = new Package(file, mainWindow.ePhononType);
                 if (!PackagePaths.ContainsKey(pkg.Header.PkgID))
                 {
                     PackagePaths.Add(pkg.Header.PkgID, pkg);
@@ -292,7 +227,7 @@ namespace Phonon
 
             while (Handle.BaseStream.Position != Handle.BaseStream.Length)
             {
-                Package pkg = new Package(ePhononType);
+                Package pkg = new Package(mainWindow.ePhononType);
                 pkg.Header.PkgID = Handle.ReadUInt16();
                 pkg.Header.PatchID = Handle.ReadUInt16();
                 ushort DynamicCount = Handle.ReadUInt16();
@@ -324,7 +259,7 @@ namespace Phonon
             foreach (string file in files)
             {
                 if (!file.EndsWith(".pkg") || file.Contains("audio") || file.Contains("investment")) continue;
-                Package pkg = new Package(file, ePhononType);
+                Package pkg = new Package(file, mainWindow.ePhononType);
                 if (!Packages.ContainsKey(pkg.Name))
                 {
                     Packages.AddOrUpdate(pkg.Name, pkg, (Key, OldValue) => OldValue);
@@ -337,10 +272,8 @@ namespace Phonon
                     }
                 }
             }
-            //foreach (Package pkg in Packages.Values.ToList())
             Parallel.ForEach(Packages.Values.ToList(), pkg =>
             {
-                //ThreadPool.QueueUserWorkItem(ThreadProc, new object[] { pkg });
                 ThreadProc(pkg);
             });
 
@@ -349,7 +282,7 @@ namespace Phonon
 
         private void SavePackageList()
         {
-            BinaryWriter Handle = new BinaryWriter(File.Open(PkgCacheName, FileMode.Create));
+            BinaryWriter Handle = new BinaryWriter(File.Open(mainWindow.PkgCacheName, FileMode.Create));
             foreach (Package pkg in Packages.Values)
             {
                 Handle.Write(pkg.Header.PkgID);
@@ -372,16 +305,8 @@ namespace Phonon
             Handle.Close();
         }
 
-        //private void ThreadProc(object state)
         private void ThreadProc(Package pkg)
         {
-            //object[] array = state as object[];
-            //Package pkg = (Package)array[0];
-            //if (pkg.Header.PkgID != 0x2f0)
-            //{
-            //    Packages.TryRemove(pkg.Name, out pkg);
-            //    return;
-            //}
             if (!pkg.GetDynamicIndices())
             {
                 Packages.TryRemove(pkg.Name, out pkg);
@@ -395,7 +320,7 @@ namespace Phonon
             }
         }
 
-        private void ShowPackageList()
+        public void ShowPackageList()
         {
             PrimaryList.Children.Clear();
 
@@ -452,8 +377,8 @@ namespace Phonon
                 return false;
             }
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            config.AppSettings.Settings.Remove(PkgPathKey);
-            config.AppSettings.Settings.Add(PkgPathKey, Path);
+            config.AppSettings.Settings.Remove(mainWindow.PkgPathKey);
+            config.AppSettings.Settings.Add(mainWindow.PkgPathKey, Path);
             config.Save(ConfigurationSaveMode.Minimal);
             return true;
         }
@@ -461,7 +386,7 @@ namespace Phonon
         public string GetPackagesPath()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            return config.AppSettings.Settings[PkgPathKey].Value.ToString();
+            return config.AppSettings.Settings[mainWindow.PkgPathKey].Value.ToString();
         }
 
         // Menu buttons
@@ -482,97 +407,9 @@ namespace Phonon
             }
         }
 
-        private void ExportTextures_Checked(object sender, RoutedEventArgs e)
-        {
-            ExportSettings.bTextures = true;
-        }
-
-        private void ExportTextures_Unchecked(object sender, RoutedEventArgs e)
-        {
-            ExportSettings.bTextures = false;
-        }
-
-        private void SetExportPath_Clicked(object sender, RoutedEventArgs e)
-        {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                bool success = SetExportPath(dialog.SelectedPath);
-                if (success)
-                {
-                    System.Windows.MessageBox.Show("Export path successfully set");
-                }
-            }
-        }
-
-        private bool SetExportPath(string Path)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-            config.AppSettings.Settings.Remove("ExportPath");
-            config.AppSettings.Settings.Add("ExportPath", Path);
-            config.Save(ConfigurationSaveMode.Minimal);
-            return true;
-        }
-
-        private void HandleVersionCheck(object sender, RoutedEventArgs e) //Changes Version based on selected radio button
-        {
-            RadioButton rb = sender as RadioButton;
-            Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-
-            if (config.AppSettings.Settings["Version"] == null) return;
-
-            switch (rb.Name)
-            {
-                case "Destiny1":
-                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny1.ToString();
-                    ePhononType = PhononType.Destiny1;
-                    mainWindow.Wind.Title = "Phonon D1";
-                    PkgPathKey = "PackagesPathD1";
-                    PkgCacheName = "packagesD1.dat";
-                    break;
-
-                case "Destiny2BL":
-                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
-                    ePhononType = PhononType.Destiny2BL;
-                    mainWindow.Wind.Title = "Phonon BL";
-                    PkgPathKey = "PackagesPathBL";
-                    PkgCacheName = "packagesBL.dat";
-                    break;
-
-                case "Destiny2PreBL":
-                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2PREBL.ToString();
-                    ePhononType = PhononType.Destiny2PREBL;
-                    mainWindow.Wind.Title = "Phonon PRE-BL";
-                    PkgPathKey = "PackagesPathPREBL";
-                    PkgCacheName = "packagesPREBL.dat";
-                    break;
-
-                default:
-
-                    break;
-            }
-
-            config.Save(ConfigurationSaveMode.Minimal);
-
-            Packages.Clear();
-
-            if (config.AppSettings.Settings[PkgPathKey] != null)
-            {
-                LoadPackageList();
-                ShowPackageList();
-            }
-            else
-            {
-                System.Windows.MessageBox.Show($"No package path found for {ePhononType.ToString()}");
-                SelectPkgsDirectoryButton_Click(sender, e);
-            }
-
-
-        }
-
         private void Export_Clicked(object sender, RoutedEventArgs e)
         {
-            if (ExportSettings.Hash == "")
+            if (mainWindow.ExportSettings.Hash == "")
             {
                 System.Windows.MessageBox.Show("No dynamic model selected");
                 return;
@@ -582,9 +419,9 @@ namespace Phonon
                 dialog.Filter = "Model files | *.fbx";
                 dialog.DefaultExt = "fbx";
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                ExportSettings.Path = dialog.FileName;
+                mainWindow.ExportSettings.Path = dialog.FileName;
             }
-            bool status = ExportSettings.Export(GetPackagesPath(), ePhononType);
+            bool status = mainWindow.ExportSettings.Export(GetPackagesPath());
             if (status)
             {
                 System.Windows.MessageBox.Show("Export success");
@@ -598,31 +435,39 @@ namespace Phonon
         private void ExportAll_Clicked(object sender, RoutedEventArgs e)
         {
 
-            if (CurrentDynamics.Count == 0)
+            if (CurrentPkg.Dynamics.Count == 0)
             {
                 System.Windows.MessageBox.Show("No PKG selected");
                 return;
             }
 
-            string outputpath;
+            string OutputPath;
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-                outputpath = dialog.SelectedPath;
+                OutputPath = dialog.SelectedPath;
             }
-            if (outputpath == "")
+            if (OutputPath == "")
             {
                 System.Windows.MessageBox.Show("No output path selected");
                 return;
             }
 
-            foreach (Dynamic dynamic in CurrentDynamics)
+            bool status = true;
+            foreach (Dynamic dynamic in CurrentPkg.Dynamics)
             {
-                ExportSettings.Hash = dynamic.HashString;
-                ExportSettings.Path = $"{outputpath}\\{CurrentPkg}\\{dynamic.Hash.ToString()}.fbx";
-                bool status = ExportSettings.Export(GetPackagesPath(), ePhononType);
+                mainWindow.ExportSettings.Hash = dynamic.HashString;
+                mainWindow.ExportSettings.Path = $"{OutputPath}/{CurrentPkg}/{dynamic.Hash.ToString()}.fbx";
+                status &= mainWindow.ExportSettings.Export(GetPackagesPath());
             }
-            System.Windows.MessageBox.Show("Export success");
+            if (status)
+            {
+                System.Windows.MessageBox.Show("Export success");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Export failed");
+            }
         }
     }
 

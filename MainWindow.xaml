@@ -4,16 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Phonon"
+        Loaded="OnControlLoaded"
         mc:Ignorable="d"
         Title="Phonon" Height="1080" Width="1920" Name="Wind">
-    <TabControl>
-        <TabItem Header="Model Viewer">
-            <local:ModelView/>
-        </TabItem>
-        <TabItem Header="Map Extraction">
-            <local:MapView/>
-        </TabItem>
-    </TabControl>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="100*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" Background="#3d3d3d" Foreground="#FFE6E6E6">
+            <MenuItem Header="Texture Format" Background="#3d3d3d" Foreground="#FFE6E6E6">
+                <RadioButton GroupName="Texture" x:Name="None" Margin="5" Checked="ChangeTextureFormat" Content="None"/>
+                <RadioButton GroupName="Texture" x:Name="DDS" Margin="5" Checked="ChangeTextureFormat" Content="DDS RGBA"/>
+                <RadioButton GroupName="Texture" x:Name="TGA" Margin="5" Checked="ChangeTextureFormat" Content="TGA"/>
+                <RadioButton GroupName="Texture" x:Name="PNG" Margin="5" Checked="ChangeTextureFormat" Content="PNG"/>
+            </MenuItem>
+            <MenuItem Header="Version" Background="#3d3d3d" Foreground="#FFE6E6E6">
+                <RadioButton GroupName="Version" x:Name="Destiny1" Margin="5" Checked="ChangeVersion" Content="Destiny 1"/>
+                <RadioButton GroupName="Version" x:Name="Destiny2PREBL" Margin="5" Checked="ChangeVersion" Content="D2 Pre-Beyond Light"/>
+                <RadioButton GroupName="Version" x:Name="Destiny2BL" Margin="5" Checked="ChangeVersion" Content="D2 Beyond Light"/>
+            </MenuItem>
+        </Menu>
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Background="#3d3d3d" Foreground="#FFE6E6E6">
+            <TabItem Header="Model Viewer" x:Name="ModelViewTab">
+                <local:ModelView  x:Name="ModelViewItem"/>
+            </TabItem>
+            <TabItem Header="Map Extraction" x:Name="MapViewTab">
+                <local:MapView/>
+            </TabItem>
+            <TabItem Header="API Extraction" x:Name="APIViewTab">
+                <local:APIView/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+
 </Window>
 
     
