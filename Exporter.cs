@@ -69,19 +69,17 @@ namespace Phonon
 
             bool status = true;
             string[] s = Path.Split("\\");
-            //Parallel.ForEach(MapNames, MapName =>
             foreach (string MapName in MapNames)
             {
                 string SavePath = String.Join("/", s) + "/" + MapName + "/";
                 Directory.CreateDirectory(SavePath);
                 List<string> StaticHashes = MapInfoDict[MapName]["static"];
-                //Parallel.ForEach(StaticHashes, MapHash =>
                 foreach (string MapHash in StaticHashes)
                 {
                     status &= RequestExportD1Map(MapHash, PackagesPath, SavePath, MapName, ((int)eTextureFormat));
-                }//);
+                }
 
-            }//);
+            }
 
             return status;
         }

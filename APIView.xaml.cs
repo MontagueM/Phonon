@@ -25,12 +25,18 @@ namespace Phonon
     public partial class APIView : UserControl
     {
         Dictionary<string, Item> ItemsDict = new Dictionary<string, Item>();
+        private MainWindow mainWindow = null;
 
         public APIView()
         {
             InitializeComponent();
             CacheAllItems();
             RefreshItemList();
+        }
+
+        private void OnControlLoaded(object sender, RoutedEventArgs e)
+        {
+            mainWindow = Window.GetWindow(this) as MainWindow;
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -58,7 +64,6 @@ namespace Phonon
         }
         private void ExtractGearBtn_Click(object sender, RoutedEventArgs e)
         {
-            Exporter ExportSettings = new Exporter();
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
@@ -66,15 +71,15 @@ namespace Phonon
                 {
                     return;
                 }
-                ExportSettings.Path = dialog.SelectedPath;
+                mainWindow.ExportSettings.Path = dialog.SelectedPath;
             }
-            ExportSettings.SaveName = ((sender as Button).DataContext as Item).Name;
+            mainWindow.ExportSettings.SaveName = ((sender as Button).DataContext as Item).Name;
             List<string> Models = ((sender as Button).DataContext as Item).Models;
             //Parallel.ForEach(Models, ModelHash =>
             foreach (string ModelHash in Models)
             {
-                ExportSettings.Hash = ModelHash;
-                ExportSettings.Export(GetPackagesPath());
+                mainWindow.ExportSettings.Hash = ModelHash;
+                mainWindow.ExportSettings.Export(GetPackagesPath());
             }//);
             System.Windows.MessageBox.Show("Export success");
             var a = 0;

@@ -56,7 +56,6 @@ namespace Phonon
             if (ePhononType == PhononType.Destiny2BL)
             {
                 status = RequestDynamicInformationBL(HashString, PackagesPath, ref MeshCount, ref bHasSkeleton);
-
             }
             else if (ePhononType == PhononType.Destiny2PREBL)
             {

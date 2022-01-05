@@ -138,7 +138,7 @@ namespace Phonon
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Key == Key.Down || e.Key == Key.Right) && SelectedDynamicIndex < PrimaryList.Children.Count - 2)
+            if ((e.Key == Key.Down || e.Key == Key.Right) && SelectedDynamicIndex < PrimaryList.Children.Count - 1)
             {
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = false;
                 SelectedDynamicIndex++;
@@ -146,7 +146,7 @@ namespace Phonon
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = true;
                 Dynamic_Click(PrimaryList.Children[SelectedDynamicIndex], new RoutedEventArgs());
             }
-            else if ((e.Key == Key.Up || e.Key == Key.Left) && SelectedDynamicIndex > 0)
+            else if ((e.Key == Key.Up || e.Key == Key.Left) && SelectedDynamicIndex > 1)
             {
                 (PrimaryList.Children[SelectedDynamicIndex] as ToggleButton).IsChecked = false;
                 SelectedDynamicIndex--;

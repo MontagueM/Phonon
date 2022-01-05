@@ -25,7 +25,6 @@ namespace Phonon
     public partial class MapView : UserControl
     {
         Dictionary<string, Dictionary<string, Dictionary<string, List<string>>>> MapInfoDict;
-        Exporter ExportSettings = new Exporter();
         string PkgName = "";
         private MainWindow mainWindow = null; // Reference to the MainWindow
         public MapView()
@@ -120,14 +119,14 @@ namespace Phonon
                 {
                     return;
                 }
-                ExportSettings.Path = dialog.SelectedPath;
+                mainWindow.ExportSettings.Path = dialog.SelectedPath;
             }
             string PkgsPath = GetPackagesPath();
             if (PkgsPath == "")
             {
                 return;
             }
-            bool status = ExportSettings.ExportD1Map(PkgsPath, MapNames, MapInfoDict[PkgName]);
+            bool status = mainWindow.ExportSettings.ExportD1Map(PkgsPath, MapNames, MapInfoDict[PkgName]);
             if (status)
             {
                 System.Windows.MessageBox.Show("Export success");

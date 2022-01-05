@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Phonon"
              mc:Ignorable="d" 
+             Loaded="OnControlLoaded"
              d:DesignHeight="1080" d:DesignWidth="1920">
     <Grid Background="#121212" >
         <Grid.ColumnDefinitions>
