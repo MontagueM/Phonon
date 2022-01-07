@@ -198,7 +198,7 @@ namespace Phonon
                 GeneratePackageList();
                 SavePackageList();
                 Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-                config.Save(ConfigurationSaveMode.Minimal);
+                config.Save(ConfigurationSaveMode.Modified);
             }
         }
         private bool ParsePackageList()
@@ -379,7 +379,7 @@ namespace Phonon
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             config.AppSettings.Settings.Remove(mainWindow.PkgPathKey);
             config.AppSettings.Settings.Add(mainWindow.PkgPathKey, Path);
-            config.Save(ConfigurationSaveMode.Minimal);
+            config.Save(ConfigurationSaveMode.Modified);
             return true;
         }
 

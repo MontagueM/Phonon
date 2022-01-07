@@ -86,7 +86,7 @@ namespace Phonon
                 else
                 {
                     System.Windows.MessageBox.Show("Incorrect value set for 'Version', defaulting to Beyond Light settings");
-                                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
                     SetBL();
                     Destiny2BL.IsChecked = true;
                 }
@@ -97,7 +97,7 @@ namespace Phonon
                 SetBL();
                 Destiny2BL.IsChecked = true;
                 config.AppSettings.Settings.Add("Version", PhononType.Destiny2BL.ToString());
-                config.Save(ConfigurationSaveMode.Minimal);
+                config.Save(ConfigurationSaveMode.Modified);
             }
             ExportSettings.ePhononType = ePhononType;
 
@@ -136,7 +136,7 @@ namespace Phonon
                 None.IsChecked = true;
                 ExportSettings.eTextureFormat = TextureFormat.None;
                 config.AppSettings.Settings.Add("TextureFormat", TextureFormat.None.ToString());
-                config.Save(ConfigurationSaveMode.Minimal);
+                config.Save(ConfigurationSaveMode.Modified);
             }
         }
 
@@ -144,8 +144,9 @@ namespace Phonon
         {
             if (config.AppSettings.Settings["TextureFormat"] == null)
             {
-                config.AppSettings.Settings.Add("TextureFormat", "None");
-                config.Save(ConfigurationSaveMode.Minimal);
+                return;
+                //config.AppSettings.Settings.Add("TextureFormat", "None");
+                //config.Save(ConfigurationSaveMode.Modified);
             }
 
 
@@ -170,7 +171,7 @@ namespace Phonon
                     break;
             }
             config.AppSettings.Settings["TextureFormat"].Value = TargetFormat.ToString();
-            config.Save(ConfigurationSaveMode.Minimal);
+            config.Save(ConfigurationSaveMode.Modified);
             ExportSettings.eTextureFormat = TargetFormat;
         }
 
@@ -195,7 +196,8 @@ namespace Phonon
                 default:
                     break;
             }
-            config.Save(ConfigurationSaveMode.Minimal);
+            config.Save(ConfigurationSaveMode.Modified);
+            config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             ExportSettings.ePhononType = ePhononType;
             ConsiderShowD1Tabs();
             Dispatcher.BeginInvoke((Action)(() => MainTabControl.SelectedIndex = 0));
