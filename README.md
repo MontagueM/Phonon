@@ -33,8 +33,6 @@ You won't get banned but if they try to read the same package Phonon will not li
 
   To access the D1 packages, please ask in the #ripping chat of the Destiny Model Rips (DMR) server or DM me.
 
-  Thanks to Philip for help with PS4 textures swizzling for Destiny 1.
-
 ## How do I get the old packages?
 
 Guide from nblock:
@@ -59,3 +57,13 @@ For now the safest thing to do if you encounter any error is to delete the whole
 I wrote Phonon in a couple days procrastinating my solid state physics lectures, and the last thing I covered was phonons. 
 
 It's basically just a term for vibrating atoms, and yes I had to google that.
+
+## License
+
+The code and icon are covered under the GPLv3 license. Creating derivative works requires attribution as specified by the license and usage of the GPLv3 license for the derivative work.
+
+## Credits
+
+Thanks to Philip for help with PS4 textures swizzling for Destiny 1.
+
+Thanks to [BlueJay](https://twitter.com/tr_bluejay) for creating the icon.
