@@ -66,6 +66,9 @@ namespace Phonon
         {
             [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestExportD1Map")]
             static extern bool RequestExportD1Map([MarshalAs(UnmanagedType.LPStr)] string MapHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName, int TextureFormat);
+            [DllImport("DestinyDynamicExtractorD1.dll", EntryPoint = "RequestExportD1DynMap")]
+            static extern bool RequestExportD1DynMap([MarshalAs(UnmanagedType.LPStr)] string MapHash, [MarshalAs(UnmanagedType.LPStr)] string pkgsPath, [MarshalAs(UnmanagedType.LPStr)] string ExportPath, [MarshalAs(UnmanagedType.LPStr)] string ExportName);
+
 
             bool status = true;
             string[] s = Path.Split("\\");
@@ -73,12 +76,19 @@ namespace Phonon
             {
                 string SavePath = String.Join("/", s) + "/" + MapName + "/";
                 Directory.CreateDirectory(SavePath);
+                string DynSavePath = $"{SavePath}/DynamicMaps/";
+                Directory.CreateDirectory(DynSavePath);
                 List<string> StaticHashes = MapInfoDict[MapName]["static"];
                 foreach (string MapHash in StaticHashes)
                 {
                     status &= RequestExportD1Map(MapHash, PackagesPath, SavePath, MapName, ((int)eTextureFormat));
                 }
 
+                List<string> DynHashes = MapInfoDict[MapName]["dynamic"];
+                foreach (string MapHash in DynHashes)
+                {
+                    status &= RequestExportD1DynMap(MapHash, PackagesPath, DynSavePath, MapName);
+                }
             }
 
             return status;

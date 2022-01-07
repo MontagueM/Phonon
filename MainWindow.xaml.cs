@@ -68,6 +68,7 @@ namespace Phonon
             {
                 if (config.AppSettings.Settings["Version"].Value == PhononType.Destiny2BL.ToString())
                 {
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
                     SetBL();
                     Destiny2BL.IsChecked = true;
 
@@ -85,6 +86,7 @@ namespace Phonon
                 else
                 {
                     System.Windows.MessageBox.Show("Incorrect value set for 'Version', defaulting to Beyond Light settings");
+                                config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
                     SetBL();
                     Destiny2BL.IsChecked = true;
                 }
@@ -187,6 +189,7 @@ namespace Phonon
                     SetPREBL();
                     break;
                 case "Destiny2BL":
+                    config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
                     SetBL();
                     break;
                 default:
@@ -232,7 +235,6 @@ namespace Phonon
         }
         private void SetBL()
         {
-            config.AppSettings.Settings["Version"].Value = PhononType.Destiny2BL.ToString();
             ePhononType = PhononType.Destiny2BL;
             Wind.Title = "Phonon BL";
             PkgPathKey = "PackagesPathBL";
