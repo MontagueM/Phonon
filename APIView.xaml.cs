@@ -73,7 +73,7 @@ namespace Phonon
                 }
                 mainWindow.ExportSettings.Path = dialog.SelectedPath;
             }
-            mainWindow.ExportSettings.SaveName = ((sender as Button).DataContext as Item).Name;
+            mainWindow.ExportSettings.SaveName = ((sender as Button).DataContext as Item).Name.Split("|")[0].Trim();
             List<string> Models = ((sender as Button).DataContext as Item).Models;
             //Parallel.ForEach(Models, ModelHash =>
             foreach (string ModelHash in Models)

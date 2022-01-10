@@ -170,6 +170,7 @@ namespace Phonon
             File.AppendAllText("debug_phonon.log", $"Clicked { ClickedDynamicHash}" + Environment.NewLine);
             uint h = Convert.ToUInt32(ClickedDynamicHash, 16);
             mainWindow.ExportSettings.Hash = ClickedDynamicHash;
+            mainWindow.ExportSettings.SaveName = "";
             Dynamic dynamic = new Dynamic(h);
             dynamic.GetDynamicMesh(GetPackagesPath(), mainWindow.ePhononType);
             MainViewModel MVM = (MainViewModel)UCModelView.Resources["MVM"];
@@ -198,7 +199,7 @@ namespace Phonon
                 GeneratePackageList();
                 SavePackageList();
                 Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
-                config.Save(ConfigurationSaveMode.Modified);
+                config.Save(ConfigurationSaveMode.Minimal);
             }
         }
         private bool ParsePackageList()
@@ -376,10 +377,28 @@ namespace Phonon
                 System.Windows.MessageBox.Show("Directory selected is invalid, please select the correct packages directory.");
                 return false;
             }
+            // Checking the path fits the version
+            if (mainWindow.ePhononType == PhononType.Destiny1)
+            {
+                if (!files[0].StartsWith("ps4_"))
+                {
+                    System.Windows.MessageBox.Show("Directory selected is invalid (not PS4 packages), please select the correct packages directory.");
+                    return false;
+                }
+            }
+            else if (mainWindow.ePhononType == PhononType.Destiny2PREBL || mainWindow.ePhononType == PhononType.Destiny2BL)
+            {
+                if (!files[0].StartsWith("w64_"))
+                {
+                    System.Windows.MessageBox.Show("Directory selected is invalid (not PC packages), please select the correct packages directory.");
+                    return false;
+                }
+            }
+
             Configuration config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
             config.AppSettings.Settings.Remove(mainWindow.PkgPathKey);
             config.AppSettings.Settings.Add(mainWindow.PkgPathKey, Path);
-            config.Save(ConfigurationSaveMode.Modified);
+            config.Save(ConfigurationSaveMode.Minimal);
             return true;
         }
 
@@ -421,6 +440,7 @@ namespace Phonon
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
                 mainWindow.ExportSettings.Path = dialog.FileName;
             }
+            mainWindow.ExportSettings.SaveName = "";
             bool status = mainWindow.ExportSettings.Export(GetPackagesPath());
             if (status)
             {

@@ -97,7 +97,7 @@ namespace Phonon
                 SetBL();
                 Destiny2BL.IsChecked = true;
                 config.AppSettings.Settings.Add("Version", PhononType.Destiny2BL.ToString());
-                config.Save(ConfigurationSaveMode.Modified);
+                config.Save(ConfigurationSaveMode.Minimal);
             }
             ExportSettings.ePhononType = ePhononType;
 
@@ -136,7 +136,7 @@ namespace Phonon
                 None.IsChecked = true;
                 ExportSettings.eTextureFormat = TextureFormat.None;
                 config.AppSettings.Settings.Add("TextureFormat", TextureFormat.None.ToString());
-                config.Save(ConfigurationSaveMode.Modified);
+                config.Save(ConfigurationSaveMode.Minimal);
             }
         }
 
@@ -145,10 +145,7 @@ namespace Phonon
             if (config.AppSettings.Settings["TextureFormat"] == null)
             {
                 return;
-                //config.AppSettings.Settings.Add("TextureFormat", "None");
-                //config.Save(ConfigurationSaveMode.Modified);
             }
-
 
             RadioButton rb = sender as RadioButton;
             TextureFormat TargetFormat;
@@ -171,7 +168,7 @@ namespace Phonon
                     break;
             }
             config.AppSettings.Settings["TextureFormat"].Value = TargetFormat.ToString();
-            config.Save(ConfigurationSaveMode.Modified);
+            config.Save(ConfigurationSaveMode.Minimal);
             ExportSettings.eTextureFormat = TargetFormat;
         }
 
@@ -196,8 +193,7 @@ namespace Phonon
                 default:
                     break;
             }
-            config.Save(ConfigurationSaveMode.Modified);
-            config = ConfigurationManager.OpenExeConfiguration(System.Windows.Forms.Application.ExecutablePath);
+            config.Save(ConfigurationSaveMode.Minimal);
             ExportSettings.ePhononType = ePhononType;
             ConsiderShowD1Tabs();
             Dispatcher.BeginInvoke((Action)(() => MainTabControl.SelectedIndex = 0));
