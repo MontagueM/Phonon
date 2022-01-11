@@ -380,7 +380,7 @@ namespace Phonon
             // Checking the path fits the version
             if (mainWindow.ePhononType == PhononType.Destiny1)
             {
-                if (!files[0].StartsWith("ps4_"))
+                if (!files[0].Contains("ps4_"))
                 {
                     System.Windows.MessageBox.Show("Directory selected is invalid (not PS4 packages), please select the correct packages directory.");
                     return false;
@@ -388,7 +388,7 @@ namespace Phonon
             }
             else if (mainWindow.ePhononType == PhononType.Destiny2PREBL || mainWindow.ePhononType == PhononType.Destiny2BL)
             {
-                if (!files[0].StartsWith("w64_"))
+                if (!files[0].Contains("w64_"))
                 {
                     System.Windows.MessageBox.Show("Directory selected is invalid (not PC packages), please select the correct packages directory.");
                     return false;
